@@ -1,0 +1,35 @@
+POST http://localhost:8080/api/v1/staffs
+Content-Type: application/json
+
+{
+
+    "firstName": "nam",
+    "lastName": "lee",
+    "email": "namleadmin@hotmail.com",
+    "password": "namle123",
+    "active": true
+}
+
+
+### GET ALL
+//get all staffs
+GET http://localhost:8080/api/v1/staffs
+
+
+###
+GET http://localhost:8080/api/v1/staffs/68a436c5c3e7597bab154bcb
+
+
+### udpate staff
+PUT http://localhost:8080/api/v1/staffs/68a436c5c3e7597bab154bcb
+Content-Type: application/json
+
+{
+    "first_name": "Jane",
+    "last_name": "Dang",
+    "email": "jane.doe@examples.com"
+}
+
+
+### DELETE
+DELETE http://localhost:8080/api/v1/staffs/68a43577c3e7597bab154bbd

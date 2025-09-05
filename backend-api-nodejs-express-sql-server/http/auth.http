@@ -1,0 +1,13 @@
+POST http://localhost:8080/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "namleadmin@hotmail.com",
+  "password": "namle123"
+}
+
+
+###
+GET http://localhost:8080/api/v1/auth/get-profile
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OGE1NmVhOTEyOWFmMTY0MTQxZjBiYjMiLCJlbWFpbCI6Im5hbWxlYWRtaW5AaG90bWFpbC5jb20iLCJpYXQiOjE3NTU2OTk3MjcsImV4cCI6MTc1NTc4NjEyN30.L0BlLuqlWIpjbnVNN_1vH8TQWIcXgOvOnFWcTj_xgfE

@@ -1,0 +1,33 @@
+POST http://localhost:8080/api/v1/categories
+Content-Type: application/json
+
+{
+  "category_name": "always love you love",
+  "description": "nhac hay ss",
+  "slug": "nhac 9x"
+  
+
+}
+
+
+### GET ALL
+//get all categories
+GET http://localhost:8080/api/v1/categories
+
+
+###
+GET http://localhost:8080/api/v1/categories/1
+
+
+###
+PUT http://localhost:8080/api/v1/categories/2
+Content-Type: application/json
+
+{
+  "category_name": "always love you love",
+  "description":" la nhac hay"
+}
+
+
+### DELETE
+DELETE http://localhost:8080/api/v1/categories/1

@@ -1,0 +1,29 @@
+POST http://localhost:8080/api/v1/brands
+Content-Type: application/json
+
+{
+  "brand_name": "DIOR",
+  "description": "Luxury fashion brand"
+}
+
+
+### GET ALL
+//get all brands
+GET http://localhost:8080/api/v1/brands
+
+
+###
+GET http://localhost:8080/api/v1/brands/689f41b2b1da9cf9fd8a5d84
+
+
+###
+PUT http://localhost:8080/api/v1/brands/689f41b2b1da9cf9fd8a5d84
+Content-Type: application/json
+
+{
+  "name": "brands update"
+}
+
+
+### DELETE
+DELETE http://localhost:8080/api/v1/brands/3
