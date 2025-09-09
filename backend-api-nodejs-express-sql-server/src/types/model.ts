@@ -17,8 +17,8 @@ export interface IProductCreate {
     stock?: number;
     slug: string;
     thumbnail?: string;
-    category: string; // ID của category
-    brand_id: string; // ID của brand
+    category: number; // ID của category
+    brand: number; // ID của brand
 }
 
 export interface IStaffCreate {

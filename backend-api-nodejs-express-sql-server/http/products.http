@@ -2,14 +2,14 @@ POST http://localhost:8080/api/v1/products
 Content-Type: application/json
 
 {
-  "product_name": "Laptop Gaming Acer Nitrosaa 56",
-  "price": 25000000,
+  "product_name": "Laptop Gaming Ascer ",
+  "price": 2500000000000000,
   "discount": 10,
   "description": "Laptop gaming cấu hình mạnh, card rời RTX 3060",
   "stock": 15,
   "slug": "laptop-gaming-acer-nitro-56",
-  "category":4,
-  "brand": 4
+  "category":1,
+  "brand": 1
 }
 
 
@@ -19,15 +19,14 @@ GET http://localhost:8080/api/v1/products
 
 
 ###
-GET http://localhost:8080/api/v1/products/689f4279b1da9cf9fd8a5d98
-
+GET http://localhost:8080/api/v1/products/2
 
 ###
-PUT http://localhost:8080/api/v1/products/689f4279b1da9cf9fd8a5d98
+PUT http://localhost:8080/api/v1/products/2
 Content-Type: application/json
 
 {
-  "product_name": "Laptop Gaming Acer Nitro 5 update namle"
+  "stock": 10
 }
 
 

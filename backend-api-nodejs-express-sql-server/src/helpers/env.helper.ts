@@ -1,6 +1,9 @@
 // load file env leen
 import dotenv from 'dotenv';
 dotenv.config();
+console.log("Loaded ENV DB_HOST:", process.env.DB_HOST);
+console.log("Loaded ENV DB_PORT:", process.env.DB_PORT);
+
 
 // Định nghĩa một kiểu dữ liệu tùy chỉnh cho các loại database
 // để TypeScript có thể kiểm tra

@@ -2,7 +2,7 @@ POST http://localhost:8080/api/v1/brands
 Content-Type: application/json
 
 {
-  "brand_name": "DIOR",
+  "brand_name": "DIOR 22",
   "description": "Luxury fashion brand"
 }
 
@@ -13,15 +13,14 @@ GET http://localhost:8080/api/v1/brands
 
 
 ###
-GET http://localhost:8080/api/v1/brands/689f41b2b1da9cf9fd8a5d84
-
+GET http://localhost:8080/api/v1/brands/1
 
 ###
-PUT http://localhost:8080/api/v1/brands/689f41b2b1da9cf9fd8a5d84
+PUT http://localhost:8080/api/v1/brands/3
 Content-Type: application/json
 
 {
-  "name": "brands update"
+  "brand_name": "brands update"
 }
 
 

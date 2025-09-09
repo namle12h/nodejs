@@ -8,108 +8,129 @@
 
 import createHttpError from "http-errors";
 import { myDataSource } from "../databases/data-source";
-import { buildSlug } from "../helpers/slugify.helper";
 import { Product } from "../entities/product.entity";
+import { IProductCreate } from "../types/model";
 
 
 const ProductRepository = myDataSource.getRepository(Product);
+const CategoryRepository = myDataSource.getRepository("Category");
+const BrandRepository = myDataSource.getRepository("Brand");
 
 
 // ==> PRIVATE ROUTES
 const getAll = async (query: any) => {
 
-    const { page = 1, limit = 10 } = query;
-
-    //Nếu tồn tại sortType và sortBy thì sẽ sắp xếp theo sortType và sortBy
-    //Nếu không tồn tại thì sẽ sắp xếp theo createdAt
-    let sortObject = {};
-    const sortType = query.sort_type || 'desc';
-    const sortBy = query.sort_by || 'Product_id';
-    sortObject = { ...sortObject, [sortBy]: sortType === 'desc' ? -1 : 1 };
-
-    console.log('<<=== 🚀sortObject  ===>>', sortObject);
-
-    //Tìm kiếm theo điều kiện
-    let where = {};
-    //Nếu có tìm kiếm theo tên sản phẩm
-    if (query.Product_name && query.Product_name.length > 0) {
-        where = { ...where, Product_name: { $regex: query.Product_name, $options: 'i' } };
-    }
-    //Nếu tìm kiếm theo danh mục
-    if (query.Product && query.Product.length > 0) {
-        where = { ...where, Product: query.Product };
-    }
-
-    const products = await ProductRepository.find({
-        where,
-        order: sortObject,
-        skip: (page - 1) * limit,
-        take: limit
+    const [products, totalCount] = await ProductRepository.findAndCount({
+        select: {
+            id: true,
+            product_name: true,
+            price: true,
+            discount: true,
+            stock: true,
+            category: {
+                category_id: true,
+                category_name: true
+            },
+            brand: {
+                brand_id: true,
+                brand_name: true
+            }
+        },
+        relations: {
+            category: true,
+            brand: true
+        },
+        order: {
+            id: 'DESC'
+        },
+        skip: 0,
+        take: 10
     });
 
-    //Đếm tổng số record hiện có của collection Product
-    const count = await ProductRepository.count({ where });
-
     return {
-        products,
         pagination: {
-            totalRecord: count,
-            limit,
-            page
-        }
+            total: totalCount,
+            page: 1,
+            limit: 10
+        },
+        products
     };
 };
 
 
 const getProductById = async (id: number) => {
-    const Product = await ProductRepository.findOne({ where: { id: id } });
-    if (!Product) {
-        throw createHttpError(404, "Product not found");
+    //check tồn tai id
+    const product = await ProductRepository.findOne({
+        select: {
+            id: true,
+            product_name: true,
+            description: true,
+            price: true,
+            discount: true,
+            stock: true,
+            category: {
+                category_id: true,
+                category_name: true
+            },
+            brand: {
+                brand_id: true,
+                brand_name: true
+            }
+        },
+        where: {
+            id
+        }
+    });
+    if (!product) {
+        throw new createHttpError.BadRequest('Product not found');
     }
-    return Product;
-
-}
-
-const createProduct = async (payload: any) => {
-
-     const product = await ProductRepository.insert(payload);
     return product;
-    // tạo mới Product
-
-
 }
+
+const createProduct = async (payload: IProductCreate) => {
+  // 1. Kiểm tra category
+  const category = await CategoryRepository.findOneBy({ category_id: Number(payload.category) });
+  if (!category) {
+    throw new Error(`Category with id ${payload.category} not found`);
+  }
+
+  // 2. Kiểm tra brand
+  const brand = await BrandRepository.findOneBy({ brand_id: Number(payload.brand) });
+  if (!brand) {
+    throw new Error(`Brand with id ${payload.brand} not found`);
+  }
+
+
+  if(payload.discount < 0 || payload.discount > 100) {
+    throw new createHttpError.BadRequest('Discount must be between 0 and 100');
+  }
+  if(payload.price < 0) {
+    throw new createHttpError.BadRequest('Price must be greater than 0');
+    }
+
+
+  // 3. Tạo product
+  const product = ProductRepository.create({
+    product_name: payload.product_name, // ⚠️ entity nên để camelCase: productName
+    price: payload.price,
+    discount: payload.discount,
+    description: payload.description,
+    stock: payload.stock,
+    category,
+    brand,
+  });
+
+  return await ProductRepository.save(product);
+};
 
 const updateProduct = async (id: number, payload: any) => {
-    const Product = await getProductById(id);
-
-    try {
-        /***
-    * Kiểm tra xem tên sản phẩm bạn vừa đổi có khác với tên sản phẩm hiện tại không
-    * Nếu khác thì kiểm tra xem có sản phẩm nào khác có tên giống không
-    */
-        if (payload.Product_name !== Product.product_name) {
-            const ProductExist = await ProductRepository.findOne({ where: { product_name: payload.product_name } });
-            if (ProductExist) {
-                throw createHttpError(400, 'Product already exists');
-            }
-        }
-        //câp nhật Product
-
-        //cập nhật slug
-        if (payload.Product_name) {
-            payload.slug = buildSlug(payload.Product_name);
-        }
-
-        Object.assign(Product, payload); //trộn dữ liệu cũ và mới
-        await ProductRepository.save(Product);
-        return Product;
-    } catch (error) {
-        if (createHttpError.isHttpError?.(error)) {
-            throw error;
-        }
-        throw createHttpError(500, "Internal Server Error");
-    }
-
+     //Kiem tinh ton tai truoc
+  const product = await getProductById(id);
+  //Cap nhat merge objects
+  Object.assign(product, payload);
+  //save lai
+  const updated = await ProductRepository.save(product)
+  return updated
 }
 
 const deleteProduct = async (id: number) => {

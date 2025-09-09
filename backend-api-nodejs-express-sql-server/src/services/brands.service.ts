@@ -10,15 +10,16 @@ const getAll = async () => {
     return brands;
 }
 
-const getById = (id: number) => {
+const getById = async (id: number) => {
 
-    return null;
+    const brand = await brandRepository.findOne({
+        where: { brand_id: id },
+    });
+    return brand;
+
 }
 
 const create = async (payload: any) => {
-
-
-
 
     const brand = brandRepository.create({
         brand_name: payload.brand_name,
@@ -27,17 +28,21 @@ const create = async (payload: any) => {
         slug: payload.slug && payload.slug !== '' ? payload.slug : buildSlug(payload.brand_name)
     });
 
-
-
-
     await brandRepository.save(brand);
     return brand;
 }
 
-const updateById = (id: number, payload: { id: number, name: string }) => {
-
-    return null;
-}
+const updateById = async (id: number, payload: {  brand_name: string }) => {
+    const brand = await brandRepository.findOne({ where: { brand_id: id } });
+    if (!brand) {
+        return null; // không tìm thấy
+    }
+    brandRepository.merge(brand, payload);
+    
+    const brands =  await brandRepository.save(brand);
+    console.log(brands);
+    return brands;
+};
 
 const deleteById = async (id: number) => {
     try {

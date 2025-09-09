@@ -16,6 +16,7 @@
   "packageManager": "pnpm@10.12.1",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "class-validator": "^0.14.2",
     "dotenv": "^17.0.1",
     "express": "^5.1.0",
     "http-errors": "^2.0.0",

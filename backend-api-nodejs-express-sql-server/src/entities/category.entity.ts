@@ -5,7 +5,7 @@ import { Product } from "./product.entity";
 
 @Entity({name: 'categories'}) //Tên bảng trong database
 export class Category {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({ type:'int' })
     category_id: number
 
     @Length(3, 50) //validator

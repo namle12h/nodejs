@@ -16,11 +16,12 @@ const getAll =async (req: Request, res: Response) => {
     //res.status(200).json(brands);
     sendJsonSuccess(res,brands)
 }
-const getById = (req: Request, res: Response) => {
+const getById = async (req: Request, res: Response) => {
     const {id} = req.params;
-    const brand = brandsService.getById(Number(id));
-    res.status(200).json(brand);
- 
+    const brand = await brandsService.getById(Number(id));
+    // res.status(200).json(brand);
+    sendJsonSuccess(res,brand)
+
 }
 
 const create = async (req: Request, res: Response, next: NextFunction) => {
@@ -34,12 +35,34 @@ const create = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
-const updateByID = (req: Request, res: Response) => {
-    const {id} = req.params;
+const updateByID = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
     const payload = req.body;
-    const result = brandsService.updateById(Number(id), payload);
-    res.status(200).json(result);
-}
+
+    const result = await brandsService.updateById(Number(id), payload);
+
+    if (!result) {
+      return res.status(404).json({
+        statusCode: 404,
+        message: "Brand not found",
+      });
+    }
+
+    return res.status(200).json({
+      statusCode: 200,
+      message: "Updated successfully",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      statusCode: 500,
+      message: "Internal server error",
+      error: (error as Error).message,
+    });
+  }
+};
+
 
 const deleteById = (req: Request, res: Response) => {
     const {id} = req.params;

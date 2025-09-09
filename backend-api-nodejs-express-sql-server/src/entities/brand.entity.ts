@@ -1,11 +1,12 @@
-import { Length, validateOrReject } from "class-validator"
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, BeforeUpdate, OneToMany } from "typeorm"
+import { Length, validateOrReject } from "class-validator";
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, BeforeUpdate, OneToMany } from "typeorm";
+
 import createError from 'http-errors';
 import { Product } from "./product.entity";
 
 @Entity({ name: 'brands' }) //Tên bảng trong database
 export class Brand {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({ type:'int'})
     brand_id: number
 
     @Length(3, 50) //validator

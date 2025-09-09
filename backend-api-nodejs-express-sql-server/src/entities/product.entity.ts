@@ -4,7 +4,7 @@ import  {Brand} from '../entities/brand.entity';
 
 @Entity({ name: 'products'})
 export class Product {
-  @PrimaryGeneratedColumn({ name: 'Id' })
+  @PrimaryGeneratedColumn({ name: 'Id', type:'int' }) // 
   id: number;
 
   // ----------------------------------------------------------------------------------------------
