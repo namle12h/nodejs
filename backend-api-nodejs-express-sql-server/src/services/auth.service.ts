@@ -1,63 +1,53 @@
-import createError from 'http-errors'
+import createError from 'http-errors';
 import jwt from 'jsonwebtoken';
-import staffModel from '../models/staff.model';
 import { env } from '../helpers/env.helper';
 import { Response } from 'express';
 import bcrypt from 'bcrypt';
+import { myDataSource } from '../databases/data-source';
+import { Staff } from '../entities/staff.entity';
+
+const staffRepository = myDataSource.getRepository(Staff);
 
 const login = async (email: string, password: string) => {
-
-    // logic đăng nhập
-    // kiểm tra email có tồn tại không
-    const staff = await staffModel.findOne({ email });
+    // 🔎 Kiểm tra email có tồn tại không
+    const staff = await staffRepository.findOne({ where: { email } });
     if (!staff) {
-        //báo lỗi chung chung 
-        // lí do để hacker không đoán dc email 
-        throw createError(404, 'email or password is incorrect');
+        throw createError(404, 'Email or password is incorrect');
     }
-    // kiểm tra mật khẩu
-    // nếu mật khẩu chưa được mã hóa 
-    // if (staff.password !== password) {
-    //     throw createError(404, 'email or password is incorrect');
 
-    // }
-
-    //Sử dụng hàm so sánh mật khẩu đã được mã hóa
-    const passwordHash = staff.password;
-    const isValid = await bcrypt.compare(password, passwordHash); // true
+    // 🔑 Kiểm tra mật khẩu (bcrypt hash)
+    const isValid = await bcrypt.compare(password, staff.password);
     if (!isValid) {
-        //Đừng thông báo: Sai mật mật khẩu. Hãy thông báo chung chung
-        throw createError(400, "Invalid email or password")
+        throw createError(400, 'Email or password is incorrect');
     }
-    // login thành công
-    // tạo token
+
+    // 🎫 Tạo JWT token
     const accessToken = jwt.sign(
-        { _id: staff._id, email: staff.email },
+        { id: staff.staff_id, email: staff.email }, // dùng id thay vì _id
         env.JWT_SECRET as string,
-        {
-            expiresIn: '24h', // expires in 24 hours (24 x 60 x 60)
-        }
+        { expiresIn: '24h' }
     );
 
     const refreshToken = jwt.sign(
-        { _id: staff._id, email: staff.email },
+        { id: staff.staff_id, email: staff.email },
         env.JWT_SECRET as string,
-        {
-            expiresIn: '365d', // expires in 24 hours (24 x 60 x 60)
-        }
+        { expiresIn: '365d' }
     );
-    return {
-        accessToken,
-        refreshToken
-    }
-}
+
+    return { accessToken, refreshToken };
+};
 
 const getProfile = async (res: Response) => {
     const { staff } = res.locals;
-    //return without password
-    return staff;
-}
+    if (!staff) {
+        throw createError(401, 'Unauthorized');
+    }
+    // Trả về staff nhưng loại bỏ password
+    const { password, ...staffData } = staff;
+    return staffData;
+};
+
 export default {
     login,
-    getProfile
-}
+    getProfile,
+};

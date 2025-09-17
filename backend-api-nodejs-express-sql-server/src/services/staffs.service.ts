@@ -10,6 +10,7 @@ import createHttpError from "http-errors";
 import { IStaffCreate } from "../types/model";
 import { myDataSource } from "../databases/data-source";
 import { Staff } from "../entities/staff.entity";
+import bcrypt from "bcrypt";
 
 const staffRepository = myDataSource.getRepository(Staff); // dùng để truy cập vào bảng staff
 
@@ -56,13 +57,28 @@ const getStaffById = async (id: string) => {
 
 }
 
-const createStaff = async (payload: any) => {
-    //Kiểm tra email có tồn tại không
-    const staff = staffRepository.create(payload);
+const createStaff = async (payload: IStaffCreate) => {
+     // Kiểm tra email đã tồn tại chưa
+  const existingStaff = await staffRepository.findOne({ where: { email: payload.email } });
+  if (existingStaff) {
+    throw createHttpError(400, "Email already exists");
+  }
 
-    await staffRepository.save(staff);
+  // Hash mật khẩu
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(payload.password, salt);
 
-    return staff;
+  // Tạo staff mới với password đã hash
+  const staff = staffRepository.create({
+    ...payload,
+    password: hashedPassword,
+  });
+
+  await staffRepository.save(staff);
+
+  // Ẩn password khi trả về
+  const { password, ...result } = staff;
+  return result;
 }
 
 const updateStaffByID = async (id: string, payload: any) => {

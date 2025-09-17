@@ -5,7 +5,9 @@ import queryRouter from './routes/v1/queries.route';
 import staffsRouter from './routes/v1/staff.route';
 import productsRouter from './routes/v1/product.route';
 import authRouter from './routes/v1/auth.route';
+import cors from 'cors';
 const app = express();
+app.use(cors())
 
 app.use(express.json()); //  dòng này là middleware để parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // dòng này là middleware để parse URL-encoded bodies
@@ -25,7 +27,7 @@ app.use('/api/v1', brandsRouter);
 app.use('/api/v1', productsRouter);
 // app.use('/api/v1', queryRouter);
 app.use('/api/v1', staffsRouter);
-// app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/auth', authRouter);
 
 // tự định nghĩa middleware
 
