@@ -9,17 +9,23 @@ export interface IBrandCreate {
 }
 
 export interface IProductCreate {
-    product_name: string;
-    price: number;
-    discount: number;
-    description?: string;
-    model_year: number;
-    stock?: number;
-    slug: string;
-    thumbnail?: string;
-    category: number; // ID của category
-    brand: number; // ID của brand
+  product_name: string;
+  price: number;
+  discount?: number;
+  description?: string;
+  stock?: number;
+  sku?: string;
+  barcode?: string;
+  status?: string;
+  thumbnail?: string;
+  isFeatured?: boolean;
+  isActive?: boolean;
+  createdBy?: number | null;
+  category: number; // ID của category
+  brand: number;    // ID của brand
+  images?: { url: string }[]; // nếu muốn thêm nhiều ảnh
 }
+
 
 export interface IStaffCreate {
     first_name: string;

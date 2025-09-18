@@ -4,7 +4,7 @@ import { Button, Checkbox, Flex, Form, Input, message } from 'antd';
 import axios from 'axios';
 import { env } from '../helpers/getEnvs';
 import { useAuthStore } from '../stores/authStore';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 type FieldType = {
   email?: string;
   password?: string;

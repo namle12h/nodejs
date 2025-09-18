@@ -1,10 +1,22 @@
-import { Column, Entity, ManyToOne, OneToMany, JoinTable, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Category } from '../entities/category.entity';
-import  {Brand} from '../entities/brand.entity';
+import { Brand } from '../entities/brand.entity';
+import { ProductImage } from '../entities/product-image.entity';
 
-@Entity({ name: 'products'})
+@Entity({ name: 'products' })
 export class Product {
-  @PrimaryGeneratedColumn({ name: 'Id', type:'int' }) // 
+  // ----------------------------------------------------------------------------------------------
+  // ID
+  // ----------------------------------------------------------------------------------------------
+  @PrimaryGeneratedColumn({ name: 'Id', type: 'int' })
   id: number;
 
   // ----------------------------------------------------------------------------------------------
@@ -14,38 +26,92 @@ export class Product {
   product_name: string;
 
   // ----------------------------------------------------------------------------------------------
+  // THUMBNAIL IMAGE
+  // ----------------------------------------------------------------------------------------------
+  @Column({ type: 'nvarchar', length: 500, nullable: true })
+  thumbnail: string;
+
+  // ----------------------------------------------------------------------------------------------
   // PRICE
   // ----------------------------------------------------------------------------------------------
   @Column({ type: 'decimal', precision: 18, scale: 2 })
   price: number;
 
   // ----------------------------------------------------------------------------------------------
-  // DISCOUNT
+  // DISCOUNT PRICE
   // ----------------------------------------------------------------------------------------------
   @Column({ type: 'decimal', precision: 18, scale: 2, default: 0 })
   discount: number;
 
   // ----------------------------------------------------------------------------------------------
-  // STOCK
+  // STOCK QUANTITY
   // ----------------------------------------------------------------------------------------------
-  @Column({  type: 'decimal', precision: 18, scale: 2, default: 0 })
+  @Column({ type: 'int', default: 0 })
   stock: number;
+
+  // ----------------------------------------------------------------------------------------------
+  // SKU
+  // ----------------------------------------------------------------------------------------------
+  @Column({ type: 'nvarchar', length: 100, nullable: true })
+  sku: string;
+
+  // ----------------------------------------------------------------------------------------------
+  // BARCODE
+  // ----------------------------------------------------------------------------------------------
+  @Column({ type: 'nvarchar', length: 100, nullable: true })
+  barcode: string;
+
+  // ----------------------------------------------------------------------------------------------
+  // STATUS
+  // ----------------------------------------------------------------------------------------------
+  @Column({ type: 'nvarchar', length: 50, default: 'Available' })
+  status: string;
 
   // ----------------------------------------------------------------------------------------------
   // DESCRIPTION
   // ----------------------------------------------------------------------------------------------
   @Column({ type: 'nvarchar', length: 'MAX', nullable: true })
   description: string;
+
+  // ----------------------------------------------------------------------------------------------
+  // IS FEATURED
+  // ----------------------------------------------------------------------------------------------
+  @Column({ type: 'bit', default: false })
+  isFeatured: boolean;
+
+  // ----------------------------------------------------------------------------------------------
+  // IS ACTIVE
+  // ----------------------------------------------------------------------------------------------
+  @Column({ type: 'bit', default: true })
+  isActive: boolean;
+
+  // ----------------------------------------------------------------------------------------------
+  // CREATED AT
+  // ----------------------------------------------------------------------------------------------
+  @CreateDateColumn({ name: 'createdAt' })
+  createdAt: Date;
+
+  // ----------------------------------------------------------------------------------------------
+  // UPDATED AT
+  // ----------------------------------------------------------------------------------------------
+  @UpdateDateColumn({ name: 'updatedAt', nullable: true })
+  updatedAt: Date;
+
+  // ----------------------------------------------------------------------------------------------
+  // CREATED BY (UserId)
+  // ----------------------------------------------------------------------------------------------
+  @Column({ type: 'int', nullable: true })
+  createdBy: number;
+
   // ----------------------------------------------------------------------------------------------
   // RELATIONS
   // ----------------------------------------------------------------------------------------------
-  @ManyToOne(() => Category, (c) => c.products, {
-    onDelete: 'SET NULL'
-  })
+  @ManyToOne(() => Category, (c) => c.products, { onDelete: 'SET NULL' })
   category: Category;
-  //tao ra field categoryId
 
-  @ManyToOne(() => Brand, (s) => s.products)
+  @ManyToOne(() => Brand, (b) => b.products, { onDelete: 'SET NULL' })
   brand: Brand;
 
+  @OneToMany(() => ProductImage, (img) => img.product, { cascade: true })
+  images: ProductImage[];
 }
