@@ -1,9 +1,9 @@
 POST http://localhost:8080/api/v1/products
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiZW1haWwiOiJuYW1sZWFkbWluQGhvdG1haWwuY29tIiwiaWF0IjoxNzU4MTc1MjYzLCJleHAiOjE3NTgyNjE2NjN9.zQC3gSYIx15Fd7Mas5BZUp5DaheYRceSxHsEHvdnLls
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTgsImVtYWlsIjoibmFtbGVhZG1pbkBob3RtYWlsLmNvbSIsImlhdCI6MTc1ODI5MzUwNSwiZXhwIjoxNzU4Mzc5OTA1fQ.aUC4ICXWzRsmMNQVpPavU0Uc-9fyMHVLlP8-duHJBGE
 
 {
-  "product_name": "Sony WH-7000XM5",
+  "product_name": "Sony WH",
   "thumbnail": "https://example.com/images/sony-wh1000xm5-thumb.jpg",
   "price": 7990000,
   "discount": 200000,
@@ -14,15 +14,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiZW1haWwiO
   "description": "Tai nghe chống ồn cao cấp, pin 30 giờ, kết nối Bluetooth 5.2",
   "isFeatured": false,
   "isActive": true,
-  "category": 2,
-  "brand": 3,
+  "category_id": 2,
+  "brand_id": 3,
   "images": [
     { "url": "https://example.com/images/sony-wh1000xm5-1.jpg" },
     { "url": "https://example.com/images/sony-wh1000xm5-2.jpg" }
   ]
 }
 
-
+###
 
 
 ### GET ALL

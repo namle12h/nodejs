@@ -21,7 +21,7 @@ GET http://localhost:8080/api/v1/staffs/68a436c5c3e7597bab154bcb
 
 
 ### udpate staff
-PUT http://localhost:8080/api/v1/staffs/68a436c5c3e7597bab154bcb
+PUT http://localhost:8080/api/v1/staffs/
 Content-Type: application/json
 
 {
@@ -32,4 +32,4 @@ Content-Type: application/json
 
 
 ### DELETE
-DELETE http://localhost:8080/api/v1/staffs/68a43577c3e7597bab154bbd
+DELETE http://localhost:8080/api/v1/staffs/17

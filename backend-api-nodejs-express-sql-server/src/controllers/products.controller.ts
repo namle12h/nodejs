@@ -22,15 +22,31 @@ const getById = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
-const create = async (req: Request, res: Response, next: NextFunction) => {
+const create = async (req: Request, res: Response, next: NextFunction) : Promise<void>=> {
     try {
         const payload = req.body;
-        const product = await productsService.createProduct(payload);
+
+        const file = req.file;
+
+        const product = await productsService.createProduct(payload, file);
         sendJsonSuccess(res, product, httpStatus.CREATED.statusCode, httpStatus.CREATED.message)
     } catch (error) {
         next(error);
     }
 }
+
+// products.controller.ts
+const uploadImage = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    if (!req.file) throw new Error("No file uploaded");
+    const url = await productsService.uploadImageToCloud(req.file); // 👈 gọi service
+    res.json({ url });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 
 const updateById = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -55,10 +71,13 @@ const deleteById = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
+
+
 export default {
     getAll,
     getById,
     create,
     updateById,
-    deleteById
+    deleteById,
+    uploadImage
 }

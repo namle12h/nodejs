@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  JoinColumn,
 } from 'typeorm';
 import { Category } from '../entities/category.entity';
 import { Brand } from '../entities/brand.entity';
@@ -107,9 +108,11 @@ export class Product {
   // RELATIONS
   // ----------------------------------------------------------------------------------------------
   @ManyToOne(() => Category, (c) => c.products, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: "category_id" })
   category: Category;
 
   @ManyToOne(() => Brand, (b) => b.products, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: "brand_id" })
   brand: Brand;
 
   @OneToMany(() => ProductImage, (img) => img.product, { cascade: true })

@@ -2,8 +2,8 @@ POST http://localhost:8080/api/v1/categories
 Content-Type: application/json
 
 {
-  "category_name": "always love you love",
-  "description": "nhac hay ss",
+  "category_name": "iphone 16",
+  "description": "i phone 16 pro max",
   "slug": "nhac 9x"
   
 

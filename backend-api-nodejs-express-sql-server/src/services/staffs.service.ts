@@ -12,7 +12,11 @@ import { myDataSource } from "../databases/data-source";
 import { Staff } from "../entities/staff.entity";
 import bcrypt from "bcrypt";
 
+
 const staffRepository = myDataSource.getRepository(Staff); // dùng để truy cập vào bảng staff
+
+
+
 
 // ==> PRIVATE ROUTES
 const getAll = async (query: any) => {
@@ -58,31 +62,33 @@ const getStaffById = async (id: string) => {
 }
 
 const createStaff = async (payload: IStaffCreate) => {
-     // Kiểm tra email đã tồn tại chưa
-  const existingStaff = await staffRepository.findOne({ where: { email: payload.email } });
-  if (existingStaff) {
-    throw createHttpError(400, "Email already exists");
-  }
+    // Kiểm tra email đã tồn tại chưa
+    const existingStaff = await staffRepository.findOne({ where: { email: payload.email } });
+    if (existingStaff) {
+        throw createHttpError(400, "Email already exists");
+    }
 
-  // Hash mật khẩu
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(payload.password, salt);
+    // Hash mật khẩu
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(payload.password, salt);
 
-  // Tạo staff mới với password đã hash
-  const staff = staffRepository.create({
-    ...payload,
-    password: hashedPassword,
-  });
+    // Tạo staff mới với password đã hash
+    const staff = staffRepository.create({
+        ...payload,
+        password: hashedPassword,
+    });
 
-  await staffRepository.save(staff);
+    await staffRepository.save(staff);
 
-  // Ẩn password khi trả về
-  const { password, ...result } = staff;
-  return result;
+    // Ẩn password khi trả về
+    const { password, ...result } = staff;
+    return result;
 }
 
 const updateStaffByID = async (id: string, payload: any) => {
     const staff = await getStaffById(id);
+
+
 
     /***
      * Kiểm tra xem tên sản phẩm bạn vừa đổi có khác với tên sản phẩm hiện tại không
@@ -101,8 +107,15 @@ const updateStaffByID = async (id: string, payload: any) => {
 
 const deleteStaffByID = async (id: string) => {
 
+    await getStaffById(id); // kiểm tra xem Staff có tồn tại không
 
-    return { message: "Staff deleted successfully" };
+    const result = await staffRepository.delete(id);
+
+    if (result.affected === 0) {
+        throw createHttpError(404, "Staff not found");
+    }
+
+    return { message: "Staff deleted successfully", ...result };
 }
 
 export default {

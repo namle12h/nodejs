@@ -21,10 +21,11 @@ export interface IProductCreate {
   isFeatured?: boolean;
   isActive?: boolean;
   createdBy?: number | null;
-  category: number; // ID của category
-  brand: number;    // ID của brand
-  images?: { url: string }[]; // nếu muốn thêm nhiều ảnh
+  category_id: number; // rõ ràng
+  brand_id: number;    // rõ ràng
+  images?: { url: string }[];
 }
+
 
 
 export interface IStaffCreate {

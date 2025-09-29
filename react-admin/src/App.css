@@ -1,0 +1,4 @@
+.ant-table-thead > tr > th {
+  font-weight: bold !important;
+  opacity: 0.85;
+}
