@@ -12,6 +12,7 @@ interface IUser {
     username: string;
     role: string;
     name: string;
+    phone: string;
     
     // Thêm các trường khác nếu cần
 }

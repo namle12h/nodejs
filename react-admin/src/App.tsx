@@ -21,6 +21,7 @@ import RegisterStaff from './shared/RegisterPage';
 import ServicePage from './modules/dashboard/pages/ServicesPage';
 import HomePage from './modules/view/pages/HomePage';
 import PrivateRoute from './shared/lib/privateRoute';
+import AppointmentManager from './modules/dashboard/pages/AppoinmentPage';
 
 
 
@@ -57,6 +58,7 @@ function App() {
               <Route index element={<DashboardPage />} />
               <Route path="products" element={<ProductsPage />} />
               <Route path="services" element={<ServicePage />} />
+              <Route path="booking" element={<AppointmentManager />} />
             </Route>
             <Route path="/login" element={<EmptyLayout />} >
               <Route index element={<LoginPage />} />

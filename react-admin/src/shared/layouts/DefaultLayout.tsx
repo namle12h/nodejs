@@ -7,6 +7,7 @@ import {
   DesktopOutlined,
   HomeOutlined,
   PieChartOutlined,
+  ScheduleOutlined,
   ShoppingCartOutlined,
   ShoppingOutlined,
   StarOutlined,
@@ -55,6 +56,7 @@ const DefaultLayout: React.FC = () => {
   const items: MenuItem[] = [
     getItem('Dashboard', '', <PieChartOutlined />), // /dashboard
     getItem('Services', 'services', <DesktopOutlined />), // /dashboard/services
+    getItem('Booking', 'booking', <ScheduleOutlined />), // /dashboard/booking
     getItem('Products', 'products', <ShoppingCartOutlined />), // /dashboard/products
     getItem('Orders', 'orders', <ShoppingOutlined />), // /dashboard/orders
     getItem('Rooms', 'rooms', <HomeOutlined />), // /dashboard/rooms
