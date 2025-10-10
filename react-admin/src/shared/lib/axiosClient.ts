@@ -26,18 +26,12 @@ axiosClient.interceptors.request.use(
   }
 );
 
+
+
 // RESPONSE
 
 axiosClient.interceptors.response.use(
-  // async (response) => {
-  //   const { access_token, refresh_token } = response.data.data;
-  //   // LOGIN
-  //   if (access_token) {
-  //     useAuthStore.getState().setToken({ accessToken: access_token, refreshToken: refresh_token });
-  //   }
 
-  //   return response;
-  // },
   async (response) => {
     // 👉 chỉ xử lý token nếu là login hoặc refresh
     if (
@@ -87,6 +81,8 @@ axiosClient.interceptors.response.use(
             authorization: `Bearer ${access_token}`,
           };
 
+
+
           return axiosClient(originalConfig);
         } else {
           clearToken();
@@ -99,5 +95,7 @@ axiosClient.interceptors.response.use(
     }
   }
 );
+
+
 
 export { axiosClient };

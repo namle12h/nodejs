@@ -22,6 +22,10 @@ import ServicePage from './modules/dashboard/pages/ServicesPage';
 import HomePage from './modules/view/pages/HomePage';
 import PrivateRoute from './shared/lib/privateRoute';
 import AppointmentManager from './modules/dashboard/pages/AppoinmentPage';
+import AuditLogTable from './modules/dashboard/components/AuditLogTable';
+import CustomerPage from './modules/dashboard/pages/CustomerPage';
+import ServiceDetailPage from './modules/view/pages/ServiceDetailPage';
+import ServiceProcessForm from './modules/dashboard/components/ServiceProcessForm';
 
 
 
@@ -58,7 +62,11 @@ function App() {
               <Route index element={<DashboardPage />} />
               <Route path="products" element={<ProductsPage />} />
               <Route path="services" element={<ServicePage />} />
+
+
               <Route path="booking" element={<AppointmentManager />} />
+              <Route path="history" element={<AuditLogTable />} />
+              <Route path="customer" element={<CustomerPage />} />
             </Route>
             <Route path="/login" element={<EmptyLayout />} >
               <Route index element={<LoginPage />} />
@@ -73,7 +81,19 @@ function App() {
                 <EmptyLayout />
               </PrivateRoute>
             }>
+
               <Route index element={<HomePage />} />
+            </Route>
+            <Route
+              path="/services/:id"
+              element={
+                <PrivateRoute allowedRoles={[]}>
+                  <EmptyLayout />
+                </PrivateRoute>
+              }
+            >
+              <Route index element={<ServiceDetailPage />} />
+
             </Route>
 
 

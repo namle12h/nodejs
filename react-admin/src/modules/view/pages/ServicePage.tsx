@@ -1,10 +1,11 @@
 import { Card, Button, Spin } from "antd";
 import { axiosClient } from "../../../shared/lib/axiosClient";
 import { useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function FeaturedServices() {
 
+    const navigate = useNavigate();
   // query params cho phân trang
   const [searchParams] = useSearchParams();
   const page = parseInt(searchParams.get("page") || "1");
@@ -79,6 +80,7 @@ export default function FeaturedServices() {
             <Card
               key={s.id}
               hoverable
+              onClick={() => navigate(`/services/${s.id}`)}
               cover={
                 <img
                   alt={s.name}

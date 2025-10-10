@@ -33,9 +33,6 @@ const AppointmentManager = () => {
         { title: "Dịch vụ", dataIndex: "serviceName", key: "serviceName" },
         { title: "Nhân viên", dataIndex: "staffName", key: "staffName" },
         { title: "Phòng", dataIndex: "roomName", key: "roomName" },
-
-        // { title: "Email", dataIndex: "contactEmail", key: "contactEmail" },
-        // { title: "Số điện thoại", dataIndex: "contactPhone", key: "contactPhone" },
         { title: "Trạng thái", dataIndex: "status", key: "status" },
         { title: "Thời gian bắt đầu", dataIndex: "startAt", key: "startAt" },
         { title: "Thời gian kết thúc", dataIndex: "endAt", key: "endAt" },
@@ -138,9 +135,9 @@ const AppointmentManager = () => {
             </div>
 
             {/* Table */}
-            <Table columns={columns} 
-            dataSource={data?.content || []}
-            rowKey="id" pagination={false} bordered />
+            <Table columns={columns}
+                dataSource={data?.content || []}
+                rowKey="id" pagination={false} bordered />
 
             {/* Pagination */}
             <div className="mt-4 flex justify-end">
@@ -154,7 +151,13 @@ const AppointmentManager = () => {
                 footer={null}
                 width={700}
             >
-                <EditAppointment />
+                {/* <EditAppointment /> */}
+                {selectedRecord && (
+                    <EditAppointment
+                        id={selectedRecord.id}
+                        onClose={() => setIsModalOpen(false)}
+                    />
+                )}
             </Modal>
         </div>
 

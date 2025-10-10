@@ -17,6 +17,7 @@ import { useSearchParams } from "react-router-dom";
 import { useState } from "react";
 import ServiceForm from "../components/ServiceForm";
 import { Title } from "react-head";
+import ServiceProcessForm from "../components/ServiceProcessForm";
 
 interface DataType {
     id: number;
@@ -38,6 +39,9 @@ export default function ServicePage() {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingService, setEditingService] = useState<DataType | null>(null);
+
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [selectedServiceId, setSelectedServiceId] = useState<number | null>(null);
 
     // ================= Fetch services =================
     const fetchServices = async ({ queryKey }: any) => {
@@ -221,7 +225,16 @@ export default function ServicePage() {
                     </Popconfirm >
 
 
-                    <Button icon={<FolderAddTwoTone />} className="!border-blue-600" />
+                    {/* <Button icon={<FolderAddTwoTone />} className="!border-blue-600" /> */}
+                    <Button
+                        icon={<FolderAddTwoTone />}
+                        className="!border-blue-600"
+                        onClick={() => {
+                            setSelectedServiceId(record.id);
+                            setIsDetailModalOpen(true);
+                        }}
+                    />
+
                 </Space>
             ),
         },
@@ -289,6 +302,27 @@ export default function ServicePage() {
                 />
             </Modal>
             <Title>Service | My Website</Title>
+            <Modal
+                open={isDetailModalOpen}
+                onCancel={() => setIsDetailModalOpen(false)}
+                footer={null}
+                title={`Thêm chi tiết cho dịch vụ ID #${selectedServiceId}`}
+                width={1000} // ✅ mở rộng modal ra 1000px
+                centered // ✅ canh giữa màn hình
+                bodyStyle={{
+                    maxHeight: "80vh", // ✅ giới hạn chiều cao để không tràn
+                    overflowY: "auto", // ✅ có thể cuộn bên trong
+                    padding: "24px 32px",
+                }}
+            >
+                {selectedServiceId && (
+                    <ServiceProcessForm serviceId={selectedServiceId} />
+                )}
+
+            </Modal>
+
+
+
 
         </Card>
     );

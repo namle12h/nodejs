@@ -27,7 +27,11 @@ export default function Header() {
 
 
     const menuItems = [
-        { key: 'home', label: 'Trang Chủ' },
+        {
+            key: 'home',
+            label: 'Trang Chủ',
+            onClick: () => navigate('/home'),
+        },
         {
             key: 'services', label: 'Dịch Vụ',
             children: services.map((s: any) => ({
@@ -45,13 +49,14 @@ export default function Header() {
     return (
         <header className="fixed w-full z-30 bg-white shadow-sm">
             <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
-                <MdSpa className="text-pink-500 text-2xl m-2" />
-                <div className="font-bold text-pink-600 text-xl "> Bella Spa</div>
-
+                <div onClick={() => navigate('/')} className="flex items-center cursor-pointer">
+                    <MdSpa className="text-pink-500 text-2xl m-2" />
+                    <div className="font-bold text-pink-600 text-xl "> Bella Spa</div>
+                </div>
                 <Menu
                     mode="horizontal"
                     className="hidden md:flex flex-1 justify-center border-none "
-                    items={menuItems }
+                    items={menuItems}
                 />
 
                 <div className="flex items-center gap-3">

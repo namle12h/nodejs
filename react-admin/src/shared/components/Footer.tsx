@@ -45,8 +45,8 @@ export default function Footer() {
                 <div>
                     <h4 className="text-lg font-semibold text-white mb-4">Nhận Ưu Đãi</h4>
                     <p className="text-gray-400 mb-4">Đăng ký để nhận thông tin khuyến mãi và ưu đãi đặc biệt</p>
-                    <Input placeholder="Nhập email của bạn" className="mb-3 bg-gray-800 border-none text-gray-200" />
-                    <Button type="primary" className="!bg-pink-600 w-full">Đăng Ký Ngay</Button>
+                    <Input placeholder="Nhập email của bạn" className="!mb-3 bg-gray-800 border-none text-gray-200" />
+                    <Button type="primary" className="!bg-pink-600 w-full ">Đăng Ký Ngay</Button>
                 </div>
             </div>
 

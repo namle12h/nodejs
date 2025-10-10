@@ -5,6 +5,7 @@ import {
   AppstoreOutlined,
   BarChartOutlined,
   DesktopOutlined,
+  HistoryOutlined,
   HomeOutlined,
   PieChartOutlined,
   ScheduleOutlined,
@@ -71,6 +72,7 @@ const DefaultLayout: React.FC = () => {
       getItem('Brand 2', 'brand2'),
     ]),
     getItem('Reports', 'reports', <BarChartOutlined />),
+    getItem('History', 'history', <HistoryOutlined />),
   ];
 
   return (

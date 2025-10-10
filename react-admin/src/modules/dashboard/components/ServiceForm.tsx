@@ -13,7 +13,21 @@ export default function ServiceForm({ initialValues, onSubmit, loading }: Servic
 
     useEffect(() => {
         if (initialValues) {
-            form.setFieldsValue(initialValues);
+            const fileList = initialValues.imageUrl
+                ? [
+                    {
+                        uid: "-1", // uid tạm
+                        name: "current-image.jpg",
+                        status: "done",
+                        url: initialValues.imageUrl, // ảnh từ backend
+                    },
+                ]
+                : [];
+
+            form.setFieldsValue({
+                ...initialValues,
+                file: fileList, // ✅ đúng format cho Upload
+            });
         } else {
             form.resetFields();
         }

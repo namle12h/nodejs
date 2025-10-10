@@ -1,159 +1,193 @@
-import { useState } from "react";
-import {
-  Form,
-  Input,
-  DatePicker,
-  Select,
-  Button,
-  Card,
-  message,
-} from "antd";
-import { ArrowLeftOutlined, SaveOutlined, CloseOutlined } from "@ant-design/icons";
+
+import { useEffect, useState } from "react";
+import { Form, Input, DatePicker, Select, Button, Card, message } from "antd";
+import { SaveOutlined, CloseOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
+import { fetchAppointmentsById, useUpdateAppointment, fetchStaffList, fetchRoomList, fetchServiceList } from "../../../shared/services/appointmentApi";
 
 const { Option } = Select;
 const { TextArea } = Input;
 
-const EditAppointment = () => {
+// ✅ Khai báo props type
+interface EditAppointmentProps {
+  id: number;
+  onClose?: () => void;
+}
+
+const EditAppointment: React.FC<EditAppointmentProps> = ({ id, onClose }) => {
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
+  const { mutate: updateAppointment, isPending } = useUpdateAppointment();
+  const [staffList, setStaffList] = useState<any[]>([]);
+  const [roomList, setRoomList] = useState<any[]>([]);
+  const [serviceList, setServiceList] = useState<any[]>([]);
+
+  useEffect(() => {
+    console.log("🟢 Bắt đầu load dữ liệu lịch hẹn...", id);
+    if (!id) return;
+
+    const loadData = async () => {
+      try {
+        const data = await fetchAppointmentsById(id);
+        console.log("📦 Dữ liệu lịch hẹn từ API:", data);
+
+        form.setFieldsValue({
+          contactName: data.contactName,
+          contactPhone: data.contactPhone,
+          contactEmail: data.contactEmail,
+          startAt: data.startAt ? dayjs(data.startAt) : null,
+          endAt: data.endAt ? dayjs(data.endAt) : null,
+          status: data.status?.toLowerCase(),
+          note: data.notes,
+          staffId: data.staffId,   // nếu API có staffId
+          roomId: data.roomId,
+          serviceId:data.serviceId     // nếu API có roomId
+        });
+      } catch (error) {
+        console.error("❌ Lỗi khi tải chi tiết:", error);
+        message.error("Không thể tải dữ liệu lịch hẹn!");
+      }
+    };
+
+    loadData();
+  }, [id, form]);
+
+
+  useEffect(() => {
+    const loadMetaData = async () => {
+      try {
+        const [staffData, roomData, serviceData] = await Promise.all([
+          fetchStaffList(),
+          fetchRoomList(),
+          fetchServiceList(),
+        ]);
+        setStaffList(staffData);
+        setRoomList(roomData);
+        setServiceList(serviceData);
+      } catch (err) {
+        console.error("❌ Lỗi khi tải nhân viên / phòng / Dịch Vụ:", err);
+        message.error("Không thể tải danh sách nhân viên hoặc phòng hoặc dịch vụ!");
+      }
+    };
+    loadMetaData();
+  }, []);
+
+  console.log("👥 Danh sách nhân viên:", staffList);
+  console.log("🚪 Danh sách phòng:", roomList);
 
   const handleSubmit = (values: any) => {
-    setLoading(true);
-    setTimeout(() => {
-      message.success("Cập nhật lịch hẹn thành công!");
-      setLoading(false);
-      console.log("Form data:", values);
-    }, 1000);
+    const payload = {
+      contactName: values.contactName,
+      contactPhone: values.contactPhone,
+      contactEmail: values.contactEmail,
+      status: values.status,
+      notes: values.note, // ✅ đổi lại đúng tên backend
+      startAt: dayjs(values.startAt).format("YYYY-MM-DDTHH:mm:ss"),
+      endAt: dayjs(values.endAt).format("YYYY-MM-DDTHH:mm:ss"),
+      serviceId: values.serviceId || null, // nếu có chọn dịch vụ
+      staffId: values.staffId || null,
+      roomId: values.roomId || null,
+    };
+
+    console.log("📤 JSON gửi lên API:", JSON.stringify(payload, null, 2));
+
+    updateAppointment(
+      { id, data: payload },
+      {
+        onSuccess: () => {
+          message.success("Cập nhật lịch hẹn thành công!");
+          if (onClose) onClose();
+        },
+        onError: (err) => {
+          console.error("❌ Lỗi cập nhật:", err);
+        },
+      }
+    );
   };
 
+
+
   return (
-    <div className="p-6">
+    <Card>
+      <Form form={form} layout="vertical" onFinish={handleSubmit}>
+        <Form.Item label="Tên khách hàng" name="contactName" rules={[{ required: true }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item label="Số điện thoại" name="contactPhone" rules={[{ required: true }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item label="Email" name="contactEmail">
+          <Input />
+        </Form.Item>
 
-      {/* Form */}
-      <Card className="shadow rounded-xl">
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-          initialValues={{
-            name: "Khanhlee",
-            phone: "0332221111",
-            email: "namelexx@gmail.com",
-            status: "confirmed",
-          }}
-        >
-          {/* Thông tin khách hàng */}
-          <h3 className="font-semibold mb-2">Thông tin Khách hàng</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <Form.Item
-              label="Tên khách hàng"
-              name="name"
-              rules={[{ required: true, message: "Vui lòng nhập tên khách hàng" }]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              label="Số điện thoại"
-              name="phone"
-              rules={[{ required: true, message: "Vui lòng nhập số điện thoại" }]}
-            >
-              <Input />
-            </Form.Item>
-          </div>
-          <Form.Item label="Email" name="email">
-            <Input />
+
+        <div className="grid grid-cols-2 gap-4">
+          <Form.Item label="Thời gian bắt đầu" name="startAt" rules={[{ required: true }]}>
+            <DatePicker showTime className="w-full" />
           </Form.Item>
+          <Form.Item label="Thời gian kết thúc" name="endAt" rules={[{ required: true }]}>
+            <DatePicker showTime className="w-full" />
+          </Form.Item>
+        </div>
 
-          {/* Thông tin thời gian */}
-          <h3 className="font-semibold mb-2 mt-4">Thông tin Thời gian</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <Form.Item
-              label="Thời gian bắt đầu"
-              name="start"
-              rules={[{ required: true, message: "Chọn thời gian bắt đầu" }]}
-            >
-              <DatePicker showTime className="w-full" />
-            </Form.Item>
-            <Form.Item
-              label="Thời gian kết thúc"
-              name="end"
-              rules={[{ required: true, message: "Chọn thời gian kết thúc" }]}
-            >
-              <DatePicker showTime className="w-full" />
-            </Form.Item>
-          </div>
+        <div className="grid grid-cols-2 gap-4">
+          <Form.Item label="Dịch vụ" name="serviceId" rules={[{ required: true }]}>
+            <Select placeholder="Chọn dịch vụ">
+              {serviceList.map((service) => (
+                <Option key={service.id} value={service.id}>
+                  {service.name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item label="Nhân viên phụ trách" name="staffId" rules={[{ required: true }]}>
+            <Select placeholder="Chọn nhân viên">
+              {staffList.map((staff) => (
+                <Option key={staff.id} value={staff.id}>
+                  {staff.name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item label="Phòng thực hiện" name="roomId" rules={[{ required: true }]}>
+            <Select placeholder="Chọn phòng">
+              {roomList.map((room) => (
+                <Option key={room.id} value={room.id}>
+                  {room.name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+        </div>
 
-          {/* Nhân viên + phòng */}
-          <h3 className="font-semibold mb-2 mt-4">Phân công Nhân viên và Phòng</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <Form.Item
-              label="Nhân viên phụ trách"
-              name="staff"
-              rules={[{ required: true, message: "Chọn nhân viên phụ trách" }]}
-            >
-              <Select placeholder="Chọn nhân viên">
-                <Option value="nv1">Nguyễn Văn A</Option>
-                <Option value="nv2">Trần Thị B</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item
-              label="Phòng thực hiện"
-              name="room"
-              rules={[{ required: true, message: "Chọn phòng" }]}
-            >
-              <Select placeholder="Chọn phòng">
-                <Option value="p1">Phòng 101</Option>
-                <Option value="p2">Phòng 102</Option>
-              </Select>
-            </Form.Item>
-          </div>
+        <div className="grid grid-cols-2 gap-4">
+          <Form.Item label="Trạng thái lịch hẹn" name="status" rules={[{ required: true }]}>
+            <Select>
+              <Option value="pending">Đang chờ</Option>
+              <Option value="confirmed">Đã xác nhận</Option>
+              <Option value="completed">Hoàn thành</Option>
+              <Option value="cancelled">Đã hủy</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item label="Ghi chú" name="note">
+            <TextArea rows={2} />
+          </Form.Item>
+        </div>
 
-          {/* Trạng thái + ghi chú */}
-          <h3 className="font-semibold mb-2 mt-4">Trạng thái và Ghi chú</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <Form.Item
-              label="Trạng thái lịch hẹn"
-              name="status"
-              rules={[{ required: true, message: "Chọn trạng thái" }]}
-            >
-              <Select>
-                <Option value="pending">Đang chờ</Option>
-                <Option value="confirmed">Đã xác nhận</Option>
-                <Option value="completed">Hoàn thành</Option>
-                <Option value="cancelled">Đã hủy</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item label="Ghi chú" name="note">
-              <TextArea rows={2} placeholder="Nhập ghi chú (tùy chọn)" />
-            </Form.Item>
-          </div>
-
-          {/* Buttons */}
-          <div className="flex justify-end gap-3 mt-6">
-            <Button icon={<CloseOutlined />}>Hủy bỏ</Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              icon={<SaveOutlined />}
-              loading={loading}
-            >
-              Lưu thay đổi
-            </Button>
-          </div>
-        </Form>
-      </Card>
-
-      {/* Lưu ý */}
-      <div className="bg-blue-50 p-4 mt-4 rounded-lg text-sm text-gray-700">
-        <p><strong>Lưu ý khi chỉnh sửa lịch hẹn:</strong></p>
-        <ul className="list-disc ml-6">
-          <li>Thời gian kết thúc phải sau thời gian bắt đầu</li>
-          <li>Khách hàng sẽ nhận được email thông báo khi có thay đổi</li>
-          <li>Phải chọn nhân viên và phòng trước khi lưu</li>
-          <li>Các trường có dấu (*) là bắt buộc</li>
-        </ul>
-      </div>
-    </div>
+        <div className="flex justify-end gap-3 mt-6">
+          <Button icon={<CloseOutlined />} onClick={onClose}>
+            Hủy bỏ
+          </Button>
+          <Button
+            type="primary"
+            htmlType="submit"
+            icon={<SaveOutlined />}
+            loading={isPending}
+          >
+            Lưu thay đổi
+          </Button>
+        </div>
+      </Form>
+    </Card>
   );
 };
 
