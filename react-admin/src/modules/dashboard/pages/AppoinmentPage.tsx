@@ -23,7 +23,6 @@ const AppointmentManager = () => {
     const [page, setPage] = useState(1);
     const limit = 10;
 
-    // gọi API lấy danh sách
     const { data } = useAppointments(page, limit);
 
     console.log("Appointments data:", data);
@@ -121,27 +120,31 @@ const AppointmentManager = () => {
                 </Space>
             </div>
 
-            {/* Filters */}
             <div className="flex gap-4 mb-4">
                 <Input placeholder="Tìm theo tên, số ĐT hoặc ID..." prefix={<SearchOutlined />} />
                 <Select defaultValue="Tất cả trạng thái" style={{ width: 180 }}>
                     <Option value="all">Tất cả trạng thái</Option>
-                    <Option value="confirmed">Đã xác nhận</Option>
-                    <Option value="pending">Đang chờ</Option>
+                    <Option value="Confirmed">Đã xác nhận</Option>
+                    <Option value="Pending">Đang chờ</Option>
                 </Select>
                 <RangePicker />
                 <Button type="primary">Áp dụng</Button>
                 <Button>Xóa bộ lọc</Button>
             </div>
 
-            {/* Table */}
             <Table columns={columns}
                 dataSource={data?.content || []}
                 rowKey="id" pagination={false} bordered />
 
-            {/* Pagination */}
             <div className="mt-4 flex justify-end">
-                <Pagination total={98} defaultPageSize={10} />
+                <Pagination
+                    current={page}
+                    total={data?.totalElements || 0}
+                    pageSize={limit}
+                    onChange={(newPage) => setPage(newPage)}
+                    showSizeChanger={false}
+                />
+
             </div>
 
             <Modal
@@ -151,7 +154,6 @@ const AppointmentManager = () => {
                 footer={null}
                 width={700}
             >
-                {/* <EditAppointment /> */}
                 {selectedRecord && (
                     <EditAppointment
                         id={selectedRecord.id}

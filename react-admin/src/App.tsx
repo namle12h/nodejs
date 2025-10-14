@@ -25,7 +25,11 @@ import AppointmentManager from './modules/dashboard/pages/AppoinmentPage';
 import AuditLogTable from './modules/dashboard/components/AuditLogTable';
 import CustomerPage from './modules/dashboard/pages/CustomerPage';
 import ServiceDetailPage from './modules/view/pages/ServiceDetailPage';
-import ServiceProcessForm from './modules/dashboard/components/ServiceProcessForm';
+import Sidebar from './modules/view/components/SideBar';
+import ProfileForm from './modules/view/components/ProfileForm';
+import ProfilePage from './modules/view/pages/ProfilePage';
+import ChangePasswordForm from './modules/view/components/ChangePasswordForm';
+import AppointmentHistory from './modules/view/components/AppointmentHistory';
 
 
 
@@ -84,6 +88,14 @@ function App() {
 
               <Route index element={<HomePage />} />
             </Route>
+            <Route path="/profile" element={<ProfilePage />}>
+              <Route index element={<ProfileForm />} /> {/* 👈 route mặc định */}
+              <Route path="info" element={<ProfileForm />} />
+              <Route path="password" element={<ChangePasswordForm />} />
+              <Route path="orders" element={<AppointmentHistory />} />
+            </Route>
+
+
             <Route
               path="/services/:id"
               element={

@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import {
   Input,
-  Select,
   Button,
   Card,
   Form,
@@ -14,11 +13,13 @@ import {
   UploadOutlined,
   DeleteOutlined,
   ClockCircleOutlined,
-  PlusOutlined,
 } from "@ant-design/icons";
 import { useAddServiceSectionItem } from "../../../shared/services/serviceApi"
 import { useParams } from "react-router-dom";
 import ServiceBenefitForm from "./benefit";
+import ImportantNotesForm from "./ImportantNotesForm";
+import ServiceProducts from "./ServiceProductForm";
+import ServiceProductForm from "./ServiceProductForm";
 
 
 const { TextArea } = Input;
@@ -70,7 +71,7 @@ export default function ServiceProcessForm({ serviceId }: ServiceProcessFormProp
         serviceId: Number(serviceId),
         type: "step", // gửi type tương ứng
         data: newStep,
-        
+
       },
       {
         onSuccess: () => {
@@ -85,7 +86,7 @@ export default function ServiceProcessForm({ serviceId }: ServiceProcessFormProp
       }
 
     );
-    
+
 
   };
 
@@ -265,98 +266,11 @@ export default function ServiceProcessForm({ serviceId }: ServiceProcessFormProp
 
 
         {activeTab === "sanpham" && (
-          <div className="text-center py-12 text-gray-700">
-            <h3 className="text-lg font-semibold mb-3 text-blue-600">🧴 Sản phẩm sử dụng</h3>
-            <p>Dầu massage thiên nhiên, tinh dầu oải hương, muối khoáng,...</p>
-          </div>
+         <ServiceProductForm serviceId={Number(serviceId)} />
         )}
 
         {activeTab === "luuy" && (
-          <Card
-            title={<span className="font-semibold text-gray-700">⚠️ Lưu Ý Quan Trọng</span>}
-            className="shadow-sm border border-gray-100"
-          >
-            <Form layout="vertical" className="grid grid-cols-1 gap-6">
-              {/* Mô tả ngắn */}
-              <Form.Item name="noteDescription" label="Mô tả ngắn">
-                <TextArea
-                  rows={3}
-                  placeholder="VD: Những điều cần biết để có trải nghiệm tốt nhất và đạt hiệu quả cao nhất"
-                />
-              </Form.Item>
-
-              {/* Nhóm lưu ý */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[
-                  { key: "before", label: "Trước Liệu Trình", color: "blue" },
-                  { key: "during", label: "Trong Quá Trình", color: "green" },
-                  { key: "after", label: "Sau Liệu Trình", color: "pink" },
-                ].map((phase) => (
-                  <Card
-                    key={phase.key}
-                    className="border border-gray-100 shadow-sm"
-                    title={
-                      <div className="flex items-center gap-2 text-base font-semibold">
-                        <span
-                          className={`inline-flex justify-center items-center w-8 h-8 rounded-full bg-${phase.color}-100 text-${phase.color}-600 text-lg`}
-                        >
-                          {phase.key === "before"
-                            ? "🕓"
-                            : phase.key === "during"
-                              ? "😊"
-                              : "💖"}
-                        </span>
-                        {phase.label}
-                      </div>
-                    }
-                  >
-                    <Form.List name={[phase.key, "notes"]}>
-                      {(fields, { add, remove }) => (
-                        <div>
-                          {fields.map(({ key, name, ...restField }) => (
-                            <div
-                              key={key}
-                              className="flex items-center gap-2 mb-2 bg-gray-50 px-2 py-1 rounded-md"
-                            >
-                              <Form.Item
-                                {...restField}
-                                name={[name, "text"]}
-                                className="flex-1 mb-0"
-                                rules={[{ required: true, message: "Nhập nội dung lưu ý" }]}
-                              >
-                                <Input placeholder="Nhập nội dung lưu ý..." />
-                              </Form.Item>
-                              <Button
-                                type="text"
-                                danger
-                                onClick={() => remove(name)}
-                                icon={<DeleteOutlined />}
-                              />
-                            </div>
-                          ))}
-
-                          <Button
-                            type="dashed"
-                            onClick={() => add()}
-                            block
-                            icon={<PlusOutlined />}
-                          >
-                            Thêm lưu ý
-                          </Button>
-                        </div>
-                      )}
-                    </Form.List>
-                  </Card>
-                ))}
-              </div>
-
-              <div className="flex justify-end mt-4">
-                <Button type="primary" className="bg-blue-600">
-                  💾 Lưu Lưu Ý
-                </Button>
-              </div>
-            </Form>
-          </Card>
+          <ImportantNotesForm serviceId={Number(serviceId)}/>
         )}
 
 

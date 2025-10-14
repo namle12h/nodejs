@@ -5,44 +5,59 @@ import {
   ExclamationCircleFilled,
   SmileFilled,
 } from "@ant-design/icons";
+import { useServiceSectionItems } from "../../../shared/services/serviceApi";
+import { useParams } from "react-router-dom";
+import { Spin } from "antd";
 
 export default function ImportantNotes() {
+  const { id } = useParams<{ id: string }>();
+  const { data: items, isLoading } = useServiceSectionItems(Number(id), "note");
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (!items || items.length === 0) {
+    return (
+      <p className="text-center text-gray-500 py-20 italic">
+        🚫 Chưa có dữ liệu lưu ý quan trọng.
+      </p>
+    );
+  }
+
+  // 🧩 Lấy item đầu tiên có extraData
+  const firstItem = items.find((x: any) => x.extraData) || items[0];
+  const extra = firstItem.extraData ? JSON.parse(firstItem.extraData) : null;
+
+  const beforeList = extra?.before || [];
+  const duringList = extra?.during || [];
+  const afterList = extra?.after || [];
+
   const notes = [
     {
       id: 1,
       title: "Trước Liệu Trình",
       icon: <ClockCircleFilled className="!text-blue-500 text-3xl" />,
       color: "blue",
-      tips: [
-        "Tẩy trang và rửa mặt sạch trước khi đến",
-        "Không sử dụng retinol 3 ngày trước",
-        "Thông báo tình trạng da và dị ứng (nếu có)",
-        "Đến đúng giờ hẹn để có thời gian thư giãn",
-      ],
+      tips: beforeList,
     },
     {
       id: 2,
       title: "Trong Quá Trình",
       icon: <SmileFilled className="!text-green-500 text-3xl" />,
       color: "green",
-      tips: [
-        "Thư giãn hoàn toàn và tận hưởng liệu trình",
-        "Thông báo ngay nếu cảm thấy khó chịu",
-        "Tắt điện thoại để có trải nghiệm tốt nhất",
-        "Uống nước đầy đủ khi được nhân viên đưa",
-      ],
+      tips: duringList,
     },
     {
       id: 3,
       title: "Sau Liệu Trình",
       icon: <HeartFilled className="!text-pink-500 text-3xl" />,
       color: "pink",
-      tips: [
-        "Không trang điểm trong 4-6 giờ đầu",
-        "Sử dụng kem chống nắng SPF 30+ khi ra ngoài",
-        "Uống nhiều nước để duy trì độ ẩm cho da",
-        "Theo dõi da và liên hệ nếu có bất thường",
-      ],
+      tips: afterList,
     },
   ];
 
@@ -54,10 +69,7 @@ export default function ImportantNotes() {
           <h2 className="text-3xl font-bold text-gray-900 mb-3">
             Lưu Ý Quan Trọng
           </h2>
-          <p className="text-gray-600">
-            Những điều cần biết để có trải nghiệm tốt nhất và đạt hiệu quả cao
-            nhất
-          </p>
+          <p className="text-gray-600">{firstItem.description}</p>
         </div>
 
         {/* Card lưu ý */}
@@ -78,16 +90,20 @@ export default function ImportantNotes() {
                 {n.title}
               </h3>
 
-              <ul className="text-left space-y-2">
-                {n.tips.map((tip, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <CheckCircleFilled
-                      className={`!text-${n.color}-500 text-base mt-1`}
-                    />
-                    <span className="text-gray-700">{tip}</span>
-                  </li>
-                ))}
-              </ul>
+              {n.tips.length > 0 ? (
+                <ul className="text-left space-y-2">
+                  {n.tips.map((tip: string, i: number) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <CheckCircleFilled
+                        className={`!text-${n.color}-500 text-base mt-1`}
+                      />
+                      <span className="text-gray-700">{tip}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-gray-400 italic">Chưa có lưu ý nào</p>
+              )}
             </div>
           ))}
         </div>

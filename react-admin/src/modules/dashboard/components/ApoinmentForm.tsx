@@ -8,7 +8,6 @@ import { fetchAppointmentsById, useUpdateAppointment, fetchStaffList, fetchRoomL
 const { Option } = Select;
 const { TextArea } = Input;
 
-// ✅ Khai báo props type
 interface EditAppointmentProps {
   id: number;
   onClose?: () => void;
@@ -22,13 +21,11 @@ const EditAppointment: React.FC<EditAppointmentProps> = ({ id, onClose }) => {
   const [serviceList, setServiceList] = useState<any[]>([]);
 
   useEffect(() => {
-    console.log("🟢 Bắt đầu load dữ liệu lịch hẹn...", id);
     if (!id) return;
 
     const loadData = async () => {
       try {
         const data = await fetchAppointmentsById(id);
-        console.log("📦 Dữ liệu lịch hẹn từ API:", data);
 
         form.setFieldsValue({
           contactName: data.contactName,
@@ -64,15 +61,12 @@ const EditAppointment: React.FC<EditAppointmentProps> = ({ id, onClose }) => {
         setRoomList(roomData);
         setServiceList(serviceData);
       } catch (err) {
-        console.error("❌ Lỗi khi tải nhân viên / phòng / Dịch Vụ:", err);
         message.error("Không thể tải danh sách nhân viên hoặc phòng hoặc dịch vụ!");
       }
     };
     loadMetaData();
   }, []);
 
-  console.log("👥 Danh sách nhân viên:", staffList);
-  console.log("🚪 Danh sách phòng:", roomList);
 
   const handleSubmit = (values: any) => {
     const payload = {
@@ -80,10 +74,10 @@ const EditAppointment: React.FC<EditAppointmentProps> = ({ id, onClose }) => {
       contactPhone: values.contactPhone,
       contactEmail: values.contactEmail,
       status: values.status,
-      notes: values.note, // ✅ đổi lại đúng tên backend
+      notes: values.note, 
       startAt: dayjs(values.startAt).format("YYYY-MM-DDTHH:mm:ss"),
       endAt: dayjs(values.endAt).format("YYYY-MM-DDTHH:mm:ss"),
-      serviceId: values.serviceId || null, // nếu có chọn dịch vụ
+      serviceId: values.serviceId || null, 
       staffId: values.staffId || null,
       roomId: values.roomId || null,
     };
@@ -162,10 +156,10 @@ const EditAppointment: React.FC<EditAppointmentProps> = ({ id, onClose }) => {
         <div className="grid grid-cols-2 gap-4">
           <Form.Item label="Trạng thái lịch hẹn" name="status" rules={[{ required: true }]}>
             <Select>
-              <Option value="pending">Đang chờ</Option>
-              <Option value="confirmed">Đã xác nhận</Option>
-              <Option value="completed">Hoàn thành</Option>
-              <Option value="cancelled">Đã hủy</Option>
+              <Option value="Pending">Đang chờ</Option>
+              <Option value="Confirmed">Đã xác nhận</Option>
+              <Option value="Completed">Hoàn thành</Option>
+              <Option value="Cancelled">Đã hủy</Option>
             </Select>
           </Form.Item>
           <Form.Item label="Ghi chú" name="note">

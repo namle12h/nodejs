@@ -42,36 +42,37 @@ export const useServiceById = (id?: number) => {
     });
 };
 
-
-
 export const addServiceSectionItem = async ({ serviceId, type, data }: any) => {
     const formData = new FormData();
 
-    // ✅ JSON phần dto
-    formData.append(
-        "dto",
-        new Blob([JSON.stringify(data)], { type: "application/json" })
-    );
+    formData.append("dto", new Blob([JSON.stringify(data)], { type: "application/json" }));
 
-    // ✅ Convert base64 → File (nếu có)
-    if (data.image) {
-        const file = base64ToFile(data.image, "image.jpg");
-        formData.append("file", file);
-    }
-
+    // ✅ Xử lý riêng cho từng loại
     if (data.extraData) {
         const extra = JSON.parse(data.extraData);
 
-        if (extra.before && extra.before.startsWith("data:image")) {
-            const beforeFile = base64ToFile(extra.before, "before.jpg");
-            formData.append("beforeImage", beforeFile);
+        // 🩵 TYPE: benefit → có ảnh
+        if (type === "benefit") {
+            if (typeof extra.before === "string" && extra.before.startsWith("data:image")) {
+                const beforeFile = base64ToFile(extra.before, "before.jpg");
+                formData.append("beforeImage", beforeFile);
+            }
+
+            if (typeof extra.after === "string" && extra.after.startsWith("data:image")) {
+                const afterFile = base64ToFile(extra.after, "after.jpg");
+                formData.append("afterImage", afterFile);
+            }
         }
 
-        if (extra.after && extra.after.startsWith("data:image")) {
-            const afterFile = base64ToFile(extra.after, "after.jpg");
-            formData.append("afterImage", afterFile);
+
+        // 💛 TYPE: notes → chỉ có text
+        if (type === "note") {
+            data.extraData = JSON.stringify(extra);
+            formData.set("dto", new Blob([JSON.stringify(data)], { type: "application/json" }));
         }
+
     }
+    
 
     const res = await axiosClient.post(
         `/services/${serviceId}/sections/${type}`,
@@ -80,8 +81,50 @@ export const addServiceSectionItem = async ({ serviceId, type, data }: any) => {
             headers: { "Content-Type": "multipart/form-data" },
         }
     );
+    console.log("🚀 [POST API]",res);
+    console.log("📦 Payload data:", data);
     return res.data;
 };
+
+
+// export const addServiceSectionItem = async ({ serviceId, type, data }: any) => {
+//     const formData = new FormData();
+
+//     // ✅ JSON phần dto
+//     formData.append(
+//         "dto",
+//         new Blob([JSON.stringify(data)], { type: "application/json" })
+//     );
+
+//     // ✅ Convert base64 → File (nếu có)
+//     if (data.image) {
+//         const file = base64ToFile(data.image, "image.jpg");
+//         formData.append("file", file);
+//     }
+
+//     if (data.extraData) {
+//         const extra = JSON.parse(data.extraData);
+
+//         if (extra.before && extra.before.startsWith("data:image")) {
+//             const beforeFile = base64ToFile(extra.before, "before.jpg");
+//             formData.append("beforeImage", beforeFile);
+//         }
+
+//         if (extra.after && extra.after.startsWith("data:image")) {
+//             const afterFile = base64ToFile(extra.after, "after.jpg");
+//             formData.append("afterImage", afterFile);
+//         }
+//     }
+
+//     const res = await axiosClient.post(
+//         `/services/${serviceId}/sections/${type}`,
+//         formData,
+//         {
+//             headers: { "Content-Type": "multipart/form-data" },
+//         }
+//     );
+//     return res.data;
+// };
 
 
 // Helper: convert base64 → File

@@ -1,19 +1,21 @@
+
+
 import { DownOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Avatar, Dropdown, Space } from 'antd';
 import { useAuthStore } from '../stores/authStore';
+import { useNavigate } from 'react-router-dom'; 
 export default function UserInfo() {
     const { user, clearToken, setUser } = useAuthStore();
+    const navigate = useNavigate(); 
 
     const formatDisplayName = (fullName?: string) => {
-        if (!fullName) return "Guest";
-        const parts = fullName.trim().split(" ");
+        if (!fullName) return 'Guest';
+        const parts = fullName.trim().split(' ');
         if (parts.length === 1) return parts[0];
-        if (parts.length === 2) return parts.join(" ");
-        // Mặc định lấy 2 từ cuối cùng (Ví dụ: Văn Dũng, Lan Anh)
-        return parts.slice(-2).join(" ");
+        if (parts.length === 2) return parts.join(' ');
+        return parts.slice(-2).join(' ');
     };
-
 
     const items: MenuProps['items'] = [
         {
@@ -22,15 +24,15 @@ export default function UserInfo() {
             disabled: true,
         },
         {
-            type: 'divider',
-        },
-        {
             key: '2',
-            label: 'Profile',
+            label: 'Tài Khoản Của Tôi',
         },
         {
             key: '3',
-            label: 'Billing',
+            label: 'Lịch Sử Đơn Hàng',
+        },
+        {
+            type: 'divider',
         },
         {
             key: '4',
@@ -40,28 +42,43 @@ export default function UserInfo() {
     ];
 
     const onClick: MenuProps['onClick'] = (e) => {
-        if (e.key === '4') {
+        switch (e.key) {
+            case '2':
+                // ✅ Chuyển đến trang hồ sơ cá nhân
+                navigate('/profile');
+                break;
+            case '3':
+                navigate('/profile/orders');
+                
+                break;
 
-            setUser(null);
+            case '4':
+                // ✅ Đăng xuất, xóa token và reload lại trang
+                setUser(null);
+                clearToken();
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                navigate('/');
+                break;
 
-            clearToken();
-            localStorage.removeItem('token'); // 🔥 xóa token khỏi localStorage
-            localStorage.removeItem('user');  // 🔥 xóa user khỏi localStorage
+            default:
+                break;
         }
-    }
+    };
+
     return (
         <Dropdown menu={{ items, onClick }}>
             <a onClick={(e) => e.preventDefault()}>
                 <Space>
-                    <Avatar icon={<UserOutlined className='!text-pink-500 ' />} />
-                    {/* {user?.name || 'Guest'} */}
+                    <Avatar icon={<UserOutlined className="!text-pink-500" />} />
                     <span
-                    style={{ whiteSpace: "nowrap", color: "#1677ff", fontWeight: "500" }}
-                    >{formatDisplayName(user?.name)}</span>
+                        style={{ whiteSpace: 'nowrap', color: '#1677ff', fontWeight: 500 }}
+                    >
+                        {formatDisplayName(user?.name)}
+                    </span>
                     <DownOutlined />
                 </Space>
             </a>
         </Dropdown>
-    )
-
+    );
 }
