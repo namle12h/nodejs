@@ -1,155 +1,173 @@
+import {
+  Form,
+  Input,
+  InputNumber,
+  Button,
+  Switch,
+  Upload,
+  Card,
+  DatePicker,
+} from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { Form, Input, InputNumber, Button, Select, Switch, Upload } from "antd";
 import { useEffect } from "react";
+import dayjs from "dayjs";
 
 interface ProductFormProps {
   initialValues?: any;
-  onSubmit: (values: any) => void;
+  onSubmit: (formData: FormData) => void;
   loading?: boolean;
-  categories?: { category_id: number; category_name: string }[];
-  brands?: { brand_id: number; brand_name: string }[];
 }
 
 export default function ProductForm({
   initialValues,
   onSubmit,
   loading,
-  categories = [],
-  brands = [],
 }: ProductFormProps) {
   const [form] = Form.useForm();
 
-  // Đồng bộ initialValues khi Edit / Add
+  // ✅ Xử lý khi load dữ liệu từ backend (convert expDate -> dayjs)
   useEffect(() => {
-    if (initialValues && Object.keys(initialValues).length > 0) {
-      form.setFieldsValue(initialValues);
+    if (initialValues) {
+      const fileList = initialValues.imageUrl
+        ? [
+            {
+              uid: "-1",
+              name: "current-image.jpg",
+              status: "done",
+              url: initialValues.imageUrl,
+            },
+          ]
+        : [];
+
+      form.setFieldsValue({
+        ...initialValues,
+        expDate: initialValues.expDate ? dayjs(initialValues.expDate) : null, // ✅ fix crash DatePicker
+        file: fileList,
+      });
     } else {
       form.resetFields();
     }
   }, [initialValues, form]);
 
+  // ✅ Gửi form
+  const handleFinish = (values: any) => {
+    const formData = new FormData();
+
+    const productData = {
+      name: values.name,
+      sku: values.sku,
+      description: values.description,
+      salePrice: values.salePrice || 0,
+      costPrice: values.costPrice || 0,
+      stockQty: values.stockQty || 0,
+      reorderLevel: values.reorderLevel || 0,
+      expDate: values.expDate ? values.expDate.format("YYYY-MM-DD") : null, // ✅ convert đúng kiểu
+      uom: "Chai",
+      active: values.active ?? true,
+    };
+
+    formData.append(
+      "product",
+      new Blob([JSON.stringify(productData)], { type: "application/json" })
+    );
+
+    // ✅ chỉ gửi file khi có
+    if (values.file && values.file.length > 0) {
+      formData.append("image", values.file[0].originFileObj);
+    }
+
+    onSubmit(formData);
+  };
+
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      onFinish={onSubmit}
-      initialValues={{
-        discount: 0,
-        stock: 0,
-        isFeatured: false,
-        isActive: true,
-        ...initialValues,
-      }}
+    <Card
+      title={initialValues ? "✏️ Cập nhật sản phẩm" : "🆕 Thêm sản phẩm mới"}
+      bordered
+      style={{ maxWidth: 900, margin: "0 auto" }}
     >
-      <Form.Item
-        name="product_name"
-        label="Product Name"
-        rules={[{ required: true, message: "Please enter product name" }]}
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleFinish}
+        initialValues={{ active: true, ...initialValues }}
       >
-        <Input />
-      </Form.Item>
-
-      <Form.Item name="thumbnail" label="Thumbnail">
-        <Upload
-          action="http://localhost:8080/api/v1/products/upload"
-          listType="picture-card"
-          maxCount={1}
-          name="image"
-          onChange={(info) => {
-            if (info.file.status === "done") {
-              form.setFieldsValue({ thumbnail: info.file.response.url });
-            }
-          }}
+        <Form.Item
+          name="name"
+          label="Tên sản phẩm"
+          rules={[{ required: true, message: "Vui lòng nhập tên sản phẩm" }]}
         >
-          <div>
-            <PlusOutlined />
-            <div style={{ marginTop: 8 }}>Upload</div>
-          </div>
-        </Upload>
-      </Form.Item>
+          <Input />
+        </Form.Item>
 
-      <Form.Item
-        name="price"
-        label="Price"
-        rules={[{ required: true, message: "Please enter price" }]}
-      >
-        <InputNumber style={{ width: "100%" }} min={0} />
-      </Form.Item>
+        <Form.Item name="sku" label="SKU">
+          <Input />
+        </Form.Item>
 
-      <Form.Item
-        name="discount"
-        label="Discount"
-        rules={[{ type: "number", min: 0, max: 1000000, message: "Discount must be 0–1,000,000" }]}
-      >
-        <InputNumber style={{ width: "100%" }} min={0} />
-      </Form.Item>
+        <Form.Item
+          name="salePrice"
+          label="Giá bán (VNĐ)"
+          rules={[{ required: true, message: "Vui lòng nhập giá bán" }]}
+        >
+          <InputNumber style={{ width: "100%" }} min={0} />
+        </Form.Item>
 
-      <Form.Item
-        name="stock"
-        label="Stock"
-        rules={[{ required: true, type: "number", min: 0, message: "Stock must be >= 0" }]}
-      >
-        <InputNumber style={{ width: "100%" }} />
-      </Form.Item>
+        <Form.Item name="costPrice" label="Giá vốn (VNĐ)">
+          <InputNumber style={{ width: "100%" }} min={0} />
+        </Form.Item>
 
-      <Form.Item
-        name="category_id"
-        label="Category"
-        rules={[{ required: true, message: "Please select a category" }]}
-      >
-        <Select placeholder="Select category" loading={!categories.length}>
-          {categories.map((c) => (
-            <Select.Option key={c.category_id} value={c.category_id}>
-              {c.category_name}
-            </Select.Option>
-          ))}
-        </Select>
-      </Form.Item>
+        <Form.Item
+          name="expDate"
+          label="Hạn Sử Dụng"
+          rules={[]}
+        >
+          <DatePicker
+            format="DD/MM/YYYY"
+            style={{ width: "100%" }}
+            placeholder="Chọn hạn sử dụng"
+          />
+        </Form.Item>
 
-      <Form.Item
-        name="brand_id"
-        label="Brand"
-        rules={[{ required: true, message: "Please select a brand" }]}
-      >
-        <Select placeholder="Select brand" loading={!brands.length}>
-          {brands.map((b) => (
-            <Select.Option key={b.brand_id} value={b.brand_id}>
-              {b.brand_name}
-            </Select.Option>
-          ))}
-        </Select>
-      </Form.Item>
+        <Form.Item
+          name="stockQty"
+          label="Tồn kho"
+          rules={[{ required: true, message: "Vui lòng nhập số lượng tồn" }]}
+        >
+          <InputNumber style={{ width: "100%" }} min={0} />
+        </Form.Item>
 
+        <Form.Item name="description" label="Mô tả sản phẩm">
+          <Input.TextArea rows={3} />
+        </Form.Item>
 
-      <Form.Item name="sku" label="SKU">
-        <Input />
-      </Form.Item>
+        {/* ✅ Upload ảnh đúng format AntD */}
+        <Form.Item
+          name="file"
+          label="Ảnh sản phẩm"
+          valuePropName="fileList"
+          getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
+        >
+          <Upload
+            beforeUpload={() => false}
+            listType="picture-card"
+            maxCount={1}
+          >
+            <div>
+              <PlusOutlined />
+              <div style={{ marginTop: 8 }}>Upload</div>
+            </div>
+          </Upload>
+        </Form.Item>
 
-      <Form.Item name="barcode" label="Barcode">
-        <Input />
-      </Form.Item>
+        <Form.Item name="active" label="Kích hoạt" valuePropName="checked">
+          <Switch />
+        </Form.Item>
 
-      <Form.Item name="status" label="Status">
-        <Input />
-      </Form.Item>
-
-      <Form.Item name="description" label="Description">
-        <Input.TextArea rows={3} />
-      </Form.Item>
-
-      <Form.Item name="isFeatured" label="Featured" valuePropName="checked">
-        <Switch />
-      </Form.Item>
-
-      <Form.Item name="isActive" label="Active" valuePropName="checked">
-        <Switch />
-      </Form.Item>
-
-      <Form.Item>
-        <Button type="primary" htmlType="submit" loading={loading}>
-          Lưu
-        </Button>
-      </Form.Item>
-    </Form>
+        <Form.Item style={{ textAlign: "center" }}>
+          <Button type="primary" htmlType="submit" loading={loading}>
+            💾 Lưu sản phẩm
+          </Button>
+        </Form.Item>
+      </Form>
+    </Card>
   );
 }

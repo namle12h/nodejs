@@ -11,7 +11,6 @@ import {
   EditOutlined,
   DeleteOutlined,
   PlusOutlined,
-  UserAddOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
 import { useCustomers } from "../../../shared/services/customerApi";

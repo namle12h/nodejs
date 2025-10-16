@@ -18,7 +18,6 @@ import { useAddServiceSectionItem } from "../../../shared/services/serviceApi"
 import { useParams } from "react-router-dom";
 import ServiceBenefitForm from "./benefit";
 import ImportantNotesForm from "./ImportantNotesForm";
-import ServiceProducts from "./ServiceProductForm";
 import ServiceProductForm from "./ServiceProductForm";
 
 
@@ -284,3 +283,4 @@ export default function ServiceProcessForm({ serviceId }: ServiceProcessFormProp
     </div>
   );
 }
+

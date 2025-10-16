@@ -4,10 +4,11 @@ import { DownOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Avatar, Dropdown, Space } from 'antd';
 import { useAuthStore } from '../stores/authStore';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
+import { axiosClient } from '../lib/axiosClient';
 export default function UserInfo() {
     const { user, clearToken, setUser } = useAuthStore();
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
     const formatDisplayName = (fullName?: string) => {
         if (!fullName) return 'Guest';
@@ -41,7 +42,7 @@ export default function UserInfo() {
         },
     ];
 
-    const onClick: MenuProps['onClick'] = (e) => {
+    const onClick: MenuProps['onClick'] = async (e) => {
         switch (e.key) {
             case '2':
                 // ✅ Chuyển đến trang hồ sơ cá nhân
@@ -49,17 +50,30 @@ export default function UserInfo() {
                 break;
             case '3':
                 navigate('/profile/orders');
-                
+
                 break;
 
             case '4':
-                // ✅ Đăng xuất, xóa token và reload lại trang
-                setUser(null);
-                clearToken();
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-                navigate('/');
+                try {
+                    const refreshToken = JSON.parse(localStorage.getItem('refreshToken') || 'null');
+
+                    if (refreshToken) {
+                        // ✅ Dùng axiosClient cho tiện
+                        await axiosClient.post('/auth/logout', { refreshToken });
+                    }
+                } catch (err) {
+                    console.error('Lỗi khi logout:', err);
+                } finally {
+                    setUser(null);
+                    clearToken();
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('refreshToken');
+                    navigate('/');
+                }
                 break;
+
+
 
             default:
                 break;

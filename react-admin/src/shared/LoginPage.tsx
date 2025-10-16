@@ -50,13 +50,17 @@ const LoginPage: React.FC = () => {
       });
 
       if (responseLogin.status === 200) {
-        const newToken = responseLogin.data.token;
-        setToken(newToken);
-        localStorage.setItem("token", JSON.stringify(newToken));
+        const accessToken = responseLogin.data.accessToken;
+        const refreshToken = responseLogin.data.refreshToken;
 
-        // lấy profile
+        // lưu cả 2 token
+        setToken(accessToken);
+        localStorage.setItem("token", JSON.stringify(accessToken));
+        localStorage.setItem("refreshToken", JSON.stringify(refreshToken));
+
+        // gọi get-profile với accessToken
         const responseProfile = await axios.get(`${env.API_URL}/auth/get-profile`, {
-          headers: { Authorization: `Bearer ${newToken}` },
+          headers: { Authorization: `Bearer ${accessToken}` },
         });
 
         if (responseProfile.status === 200) {
@@ -165,7 +169,7 @@ const LoginPage: React.FC = () => {
 
         <p className="text-center text-gray-600 mt-6">
           Chưa có tài khoản?{" "}
-          <a href="#" className="text-pink-500 font-semibold hover:underline">
+          <a href="register" className="text-pink-500 font-semibold hover:underline">
             Đăng ký ngay
           </a>
         </p>

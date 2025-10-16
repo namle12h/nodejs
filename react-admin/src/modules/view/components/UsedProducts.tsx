@@ -1,37 +1,38 @@
-import { Card } from "antd";
-import { SafetyCertificateOutlined } from "@ant-design/icons";
 
-export default function UsedProducts() {
-  const products = [
-    {
-      id: 1,
-      name: "Sữa Rửa Mặt La Roche-Posay",
-      desc: "Sản phẩm nhập khẩu từ Pháp, dành cho da nhạy cảm",
-      image:
-        "https://res.cloudinary.com/dtxcwdf7r/image/upload/v1759822001/spring_products/la_roche_posay.jpg",
-    },
-    {
-      id: 2,
-      name: "Serum Vitamin C Skinceuticals",
-      desc: "Serum chống oxy hóa cao cấp từ Mỹ",
-      image:
-        "https://res.cloudinary.com/dtxcwdf7r/image/upload/v1759822102/spring_products/skinceuticals_vitc.jpg",
-    },
-    {
-      id: 3,
-      name: "Mặt Nạ Collagen Nhật Bản",
-      desc: "Mặt nạ sinh học từ Nhật Bản, giàu collagen",
-      image:
-        "https://res.cloudinary.com/dtxcwdf7r/image/upload/v1759822203/spring_products/japan_collagen.jpg",
-    },
-    {
-      id: 4,
-      name: "Kem Dưỡng Ẩm Cetaphil",
-      desc: "Kem dưỡng ẩm an toàn cho mọi loại da",
-      image:
-        "https://res.cloudinary.com/dtxcwdf7r/image/upload/v1759822304/spring_products/cetaphil_cream.jpg",
-    },
-  ];
+import { Card, Spin } from "antd";
+import { SafetyCertificateOutlined } from "@ant-design/icons";
+import { useServiceProducts } from "../../../shared/services/productApi";
+
+interface UsedProductsProps {
+  serviceId: number;
+}
+
+export default function UsedProducts({ serviceId }: UsedProductsProps) {
+  const { data: serviceProducts, isLoading } = useServiceProducts(serviceId);
+
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center py-20">
+        <Spin size="large" />
+      </div>
+    );
+
+  if (!serviceProducts || serviceProducts.length === 0)
+    return (
+      <div className="text-center text-gray-500 py-16">
+        Chưa có sản phẩm nào được sử dụng cho dịch vụ này.
+      </div>
+    );
+
+  // Map dữ liệu từ API ra đúng cấu trúc hiển thị
+  const products =
+    serviceProducts.map((sp: any) => ({
+      id: sp.id,
+      name: sp.productName,
+      desc: sp.note || "Không có mô tả",
+      image: sp.imageUrl, // ✅ dùng đúng field từ API
+    })) || [];
+
 
   return (
     <section className="py-20 bg-white">
@@ -49,7 +50,7 @@ export default function UsedProducts() {
 
         {/* Danh sách sản phẩm */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-          {products.map((p) => (
+          {products.map((p: any) => (
             <Card
               key={p.id}
               hoverable
@@ -57,7 +58,11 @@ export default function UsedProducts() {
                 <img
                   alt={p.name}
                   src={p.image}
-                  className="w-full h-56 object-contain p-4"
+                  className="w-full h-56 object-cover rounded-t-2xl"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src =
+                      "https://via.placeholder.com/300x200?text=No+Image";
+                  }}
                 />
               }
               className="rounded-2xl shadow-md hover:shadow-lg transition-all duration-300"
@@ -66,7 +71,9 @@ export default function UsedProducts() {
               <h3 className="text-lg font-semibold text-gray-800 mb-2 text-center">
                 {p.name}
               </h3>
-              <p className="text-gray-600 text-sm text-center">{p.desc}</p>
+              <p className="text-gray-600 text-sm text-center line-clamp-2">
+                {p.desc}
+              </p>
             </Card>
           ))}
         </div>
