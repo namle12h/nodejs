@@ -1,8 +1,8 @@
 
 
 
-import { Menu, Input, Button, List, Dropdown, Badge } from 'antd';
-import { BellOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
+import { Menu, Input, Button, List } from 'antd';
+import { SearchOutlined, UserOutlined } from '@ant-design/icons';
 import { MdSpa } from 'react-icons/md';
 import UserInfo from './UserInfo';
 import { useNavigate } from 'react-router-dom';
@@ -54,7 +54,6 @@ export default function Header() {
         { id: 3, title: "Bạn có đánh giá mới", time: "25/10/2025", isRead: false },
     ]);
 
-    const notificationSound = new Audio("/image/audio/notification.mp3");
     const unreadCount = notifications.filter(n => !n.isRead).length;
 
     // 🔔 Menu popup danh sách thông báo
@@ -108,11 +107,6 @@ export default function Header() {
 
                 <div className="flex items-center gap-3">
                     <Input prefix={<SearchOutlined />} placeholder="Tìm kiếm dịch vụ..." className="hidden md:block w-60" />
-                    <Dropdown overlay={notificationMenu} placement="bottomRight" trigger={['click']}>
-                        <Badge count={unreadCount} size="small" offset={[-5, 5]}>
-                            <BellOutlined className="text-xl cursor-pointer text-gray-700 hover:text-pink-600" />
-                        </Badge>
-                    </Dropdown>
                     {/* 🔥 Nếu user tồn tại -> hiển thị UserInfo, ngược lại hiển thị nút Đăng nhập */}
                     {user ? (
                         <UserInfo />

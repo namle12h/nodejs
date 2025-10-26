@@ -1,8 +1,8 @@
 
 
 
-import { Menu, Input, Button, List, Dropdown, Badge } from 'antd';
-import { BellOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
+import { Menu, Input, Button } from 'antd';
+import { SearchOutlined, UserOutlined } from '@ant-design/icons';
 import { MdSpa } from 'react-icons/md';
 import UserInfo from './UserInfo';
 import { useNavigate } from 'react-router-dom';
@@ -54,44 +54,7 @@ export default function Header() {
         { id: 3, title: "Bạn có đánh giá mới", time: "25/10/2025", isRead: false },
     ]);
 
-    const notificationSound = new Audio("/image/audio/notification.mp3");
     const unreadCount = notifications.filter(n => !n.isRead).length;
-
-    // 🔔 Menu popup danh sách thông báo
-    const notificationMenu = (
-        <div style={{ width: 300, maxHeight: 400, overflowY: 'auto', background: 'white', borderRadius: 8, boxShadow: '0 2px 10px rgba(0,0,0,0.15)' }}>
-            <div style={{ padding: '10px 15px', borderBottom: '1px solid #eee', fontWeight: 600 }}>Thông báo</div>
-            <List
-                dataSource={notifications}
-                renderItem={(item) => (
-                    <List.Item
-                        style={{
-                            background: item.isRead ? '#fafafa' : '#e6f4ff',
-                            cursor: 'pointer',
-                            padding: '10px 15px',
-                        }}
-                        onClick={() => {
-                            setNotifications((prev) =>
-                                prev.map((n) =>
-                                    n.id === item.id ? { ...n, isRead: true } : n
-                                )
-                            );
-                        }}
-                    >
-                        <List.Item.Meta
-                            title={<span style={{ fontWeight: item.isRead ? 400 : 600 }}>{item.title}</span>}
-                            description={<span style={{ fontSize: 12, color: '#999' }}>{item.time}</span>}
-                        />
-                    </List.Item>
-                )}
-            />
-            <div style={{ borderTop: '1px solid #eee', textAlign: 'center', padding: 10 }}>
-                <Button type="link" onClick={() => navigate('/notifications')}>
-                    Xem tất cả
-                </Button>
-            </div>
-        </div>
-    );
 
     return (
         <header className="fixed w-full z-30 bg-white shadow-sm">
@@ -108,11 +71,6 @@ export default function Header() {
 
                 <div className="flex items-center gap-3">
                     <Input prefix={<SearchOutlined />} placeholder="Tìm kiếm dịch vụ..." className="hidden md:block w-60" />
-                    <Dropdown overlay={notificationMenu} placement="bottomRight" trigger={['click']}>
-                        <Badge count={unreadCount} size="small" offset={[-5, 5]}>
-                            <BellOutlined className="text-xl cursor-pointer text-gray-700 hover:text-pink-600" />
-                        </Badge>
-                    </Dropdown>
                     {/* 🔥 Nếu user tồn tại -> hiển thị UserInfo, ngược lại hiển thị nút Đăng nhập */}
                     {user ? (
                         <UserInfo />

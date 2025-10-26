@@ -54,7 +54,6 @@ export default function Header() {
         { id: 3, title: "Bạn có đánh giá mới", time: "25/10/2025", isRead: false },
     ]);
 
-    const notificationSound = new Audio("/image/audio/notification.mp3");
     const unreadCount = notifications.filter(n => !n.isRead).length;
 
     // 🔔 Menu popup danh sách thông báo

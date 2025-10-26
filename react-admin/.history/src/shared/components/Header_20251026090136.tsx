@@ -1,8 +1,8 @@
 
 
 
-import { Menu, Input, Button, List, Dropdown, Badge } from 'antd';
-import { BellOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
+import { Menu, Input, Button, List, Dropdown } from 'antd';
+import { SearchOutlined, UserOutlined } from '@ant-design/icons';
 import { MdSpa } from 'react-icons/md';
 import UserInfo from './UserInfo';
 import { useNavigate } from 'react-router-dom';
@@ -54,7 +54,6 @@ export default function Header() {
         { id: 3, title: "Bạn có đánh giá mới", time: "25/10/2025", isRead: false },
     ]);
 
-    const notificationSound = new Audio("/image/audio/notification.mp3");
     const unreadCount = notifications.filter(n => !n.isRead).length;
 
     // 🔔 Menu popup danh sách thông báo
