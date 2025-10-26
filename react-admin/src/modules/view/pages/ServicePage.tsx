@@ -89,7 +89,7 @@ export default function FeaturedServices() {
                 />
               }
               className="shadow-md rounded-xl overflow-hidden"
-              bodyStyle={{ padding: "16px" }} // bớt padding default của antd
+              styles={{body:{ padding: "16px" }}} // bớt padding default của antd
             >
               {/* Tên dịch vụ */}
               <h3 className="text-lg font-semibold text-gray-800 mb-2">

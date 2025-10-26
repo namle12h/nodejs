@@ -43,9 +43,8 @@ export default function ProcessSteps() {
           {steps.map((step: any, index: number) => (
             <div
               key={step.id} // ✅ id duy nhất
-              className={`flex flex-col md:flex-row items-center gap-10 ${
-                index % 2 === 1 ? "md:flex-row-reverse" : ""
-              }`}
+              className={`flex flex-col md:flex-row items-center gap-10 ${index % 2 === 1 ? "md:flex-row-reverse" : ""
+                }`}
             >
               {/* Ảnh minh họa */}
               <Card
@@ -61,7 +60,7 @@ export default function ProcessSteps() {
                   />
                 }
                 className="flex-1 rounded-2xl shadow-md overflow-hidden"
-                bodyStyle={{ display: "none" }}
+                styles={{ body: { display: "none" } }}
               />
 
               {/* Nội dung */}

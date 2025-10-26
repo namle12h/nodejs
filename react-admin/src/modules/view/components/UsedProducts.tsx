@@ -66,7 +66,7 @@ export default function UsedProducts({ serviceId }: UsedProductsProps) {
                 />
               }
               className="rounded-2xl shadow-md hover:shadow-lg transition-all duration-300"
-              bodyStyle={{ padding: "16px" }}
+              styles={{ body:{padding: "16px" }}}
             >
               <h3 className="text-lg font-semibold text-gray-800 mb-2 text-center">
                 {p.name}

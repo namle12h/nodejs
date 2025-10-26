@@ -1,4 +1,4 @@
-import  { useState } from "react";
+import { useState } from "react";
 import {
   Input,
   Button,
@@ -14,7 +14,7 @@ import {
   DeleteOutlined,
   ClockCircleOutlined,
 } from "@ant-design/icons";
-import { useAddServiceSectionItem } from "../../../shared/services/serviceApi"
+import { useAddServiceSectionItem, useServiceById, useServices } from "../../../shared/services/serviceApi"
 import { useParams } from "react-router-dom";
 import ServiceBenefitForm from "./benefit";
 import ImportantNotesForm from "./ImportantNotesForm";
@@ -42,6 +42,7 @@ export default function ServiceProcessForm({ serviceId }: ServiceProcessFormProp
   const [imageBase64, setImageBase64] = useState<string | undefined>(undefined);
   const { id } = useParams<{ id: string }>(); // Lấy id service từ URL
   const { mutate: addSectionItem, isPending } = useAddServiceSectionItem();
+ const { data: service } = useServiceById(serviceId);
 
   // ✅ Thêm state lưu tab hiện tại
   const [activeTab, setActiveTab] = useState<"quytrinh" | "loiich" | "sanpham" | "luuy" | "danhgia">("quytrinh");
@@ -99,8 +100,10 @@ export default function ServiceProcessForm({ serviceId }: ServiceProcessFormProp
     <div className="p-6 bg-gray-100 min-h-screen">
       <Card className="max-w-5xl mx-auto shadow-lg rounded-2xl border border-gray-200">
         <Title level={3} className="text-center text-blue-600 mb-6">
-          Chi tiết dịch vụ: Massage Body 💆‍♀️
+          Chi tiết dịch vụ :
+          <span className="!text-3xl text-pink-500"> {service?.name || "Đang tải..."}</span>
         </Title>
+
 
         {/* ✅ Tabs có logic click */}
         <div className="flex gap-6 justify-center border-b mb-8 text-sm font-medium">
@@ -265,11 +268,11 @@ export default function ServiceProcessForm({ serviceId }: ServiceProcessFormProp
 
 
         {activeTab === "sanpham" && (
-         <ServiceProductForm serviceId={Number(serviceId)} />
+          <ServiceProductForm serviceId={Number(serviceId)} />
         )}
 
         {activeTab === "luuy" && (
-          <ImportantNotesForm serviceId={Number(serviceId)}/>
+          <ImportantNotesForm serviceId={Number(serviceId)} />
         )}
 
 

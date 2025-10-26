@@ -5,11 +5,24 @@ import { useServices } from "../../../shared/services/serviceApi";
 import { useCreateAppointment } from "../../../shared/services/appointmentApi";
 import { useAuthStore } from '../../../shared/stores/authStore';
 
-export default function BookingForm() {
+interface BookingFormProps {
+    onSuccess?: () => void; // ✅ thêm prop để nhận callback đóng modal
+}
+
+export default function BookingForm({ onSuccess }: BookingFormProps) {
     const [form] = Form.useForm();
     const { data: services = [] } = useServices(1, 10);
-    const mutationBooking = useCreateAppointment();
+    // const mutationBooking = useCreateAppointment();
     const { user } = useAuthStore();
+
+
+    // ✅ Truyền callback đóng modal vào hook
+    const mutationBooking = useCreateAppointment({
+        onSuccess: () => {
+            form.resetFields();
+            if (onSuccess) onSuccess(); // đóng modal
+        },
+    });
 
     const onFinish = (values: any) => {
         let payload: any = {
@@ -96,8 +109,8 @@ export default function BookingForm() {
                             >
 
                                 <TimePicker className="w-full" format="HH:mm" />
-                                
-                                
+
+
 
                             </Form.Item>
 

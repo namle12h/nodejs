@@ -309,11 +309,8 @@ export default function ServicePage() {
                 title={`Thêm chi tiết cho dịch vụ ID #${selectedServiceId}`}
                 width={1000} // ✅ mở rộng modal ra 1000px
                 centered // ✅ canh giữa màn hình
-                bodyStyle={{
-                    maxHeight: "80vh", // ✅ giới hạn chiều cao để không tràn
-                    overflowY: "auto", // ✅ có thể cuộn bên trong
-                    padding: "24px 32px",
-                }}
+
+                styles={{ body: { maxHeight: 600, overflowY: "auto", padding: "24px 32px" } }}
             >
                 {selectedServiceId && (
                     <ServiceProcessForm serviceId={selectedServiceId} />

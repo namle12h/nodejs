@@ -40,7 +40,7 @@ export default function Header() {
                 onClick: () => navigate(`/services/${s.id}`),
             })),
         },
-        { key: 'product', label: 'Sản Phẩm' },
+        { key: 'product', label: 'Sản Phẩm' ,onClick: () => navigate(`/products`),},
         { key: 'booking', label: 'Đặt Lịch' },
         { key: 'about', label: 'Về Chúng Tôi' },
         { key: 'contact', label: 'Liên Hệ' },

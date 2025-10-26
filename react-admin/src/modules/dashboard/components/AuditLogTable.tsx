@@ -205,7 +205,7 @@ const AuditLogPage = () => {
       <Card
         title="Danh sách hoạt động"
         className="rounded-2xl shadow-sm"
-        bodyStyle={{ padding: 0 }}
+        styles={{body:{ padding: 0 }}}
       >
         {isLoading ? (
           <div className="flex justify-center py-12">

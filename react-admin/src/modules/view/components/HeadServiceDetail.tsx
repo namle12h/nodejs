@@ -26,7 +26,7 @@ export default function HeadServiceDetail() {
                 <Card
                     className="max-w-7xl  rounded-2xl shadow-lg  from-pink-50 !border-none to-white"
                     style={{ background: "transparent", boxShadow: "none" }}
-                    bodyStyle={{ padding: "2rem 3rem" }}
+                    styles={{body:{ padding: "2rem 3rem" }}}
                 >
                     <div className="grid md:grid-cols-2 gap-10 items-center">
                         {/* LEFT CONTENT */}
