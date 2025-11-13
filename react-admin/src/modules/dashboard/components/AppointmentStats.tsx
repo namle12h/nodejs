@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useServiceStats } from "../../../shared/services/statsApi";
+import type { Dayjs } from 'dayjs';
 
 // Dữ liệu Trạng thái (để tạo chú thích)
 const statusLegend = [
@@ -9,13 +10,21 @@ const statusLegend = [
     { label: "Đỉnh", color: "#a855f7" }, // purple-500
 ];
 
-export default function AppointmentStats() {
-    const [startDate, setStartDate] = useState("2025-10-10");
-    const [endDate, setEndDate] = useState("2025-11-10");
-    const [period, setPeriod] = useState("today");
+interface AppoimentStatsProps {
+    startDate: Dayjs;
+    endDate: Dayjs;
+}
+
+export default function AppointmentStats({ startDate, endDate }: AppoimentStatsProps) {
+  
+    const [period, setPeriod] = useState("");
 
     // API hook gọi sau khi các state được khởi tạo
-    const { data, isLoading } = useServiceStats(startDate, endDate, period);
+     const { data, isLoading } = useServiceStats(
+           startDate.format('YYYY-MM-DD'), // Định dạng ngày là YYYY-MM-DD
+           endDate.format('YYYY-MM-DD'),   // Định dạng ngày là YYYY-MM-DD
+           period
+       );
 
     const [dailyData, setDailyData] = useState([]);
     const [timeSlotData, setTimeSlotData] = useState([]);
@@ -74,7 +83,7 @@ export default function AppointmentStats() {
                         <div
                             className="w-4 rounded-t-lg transition-all duration-300"
                             style={{
-                                height: `${item.count / 1.5}px`, // Chiều cao mô phỏng
+                                height: `${item.count / 0.5}px`, // Chiều cao mô phỏng
                                 backgroundColor: item.count > 80 ? '#a855f7' : (item.count > 60 ? '#3b82f6' : (item.count > 40 ? '#22c55e' : '#f87171')),
                             }}
                         ></div>

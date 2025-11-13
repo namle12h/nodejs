@@ -51,3 +51,78 @@ export const useCustomerStats = (startDate: string, endDate: string, period: str
         enabled: !!startDate && !!endDate,  // Chỉ gọi API khi có `startDate` và `endDate`
     });
 };
+
+
+const fetchPerformanceStats = async (startDate: string, endDate: string, period: string) => {
+  try {
+    const response = await axiosClient.get(`/stats/performance`, {
+      params: { startDate, endDate, period }
+    });
+    console.log("Dữ liệu trả về từ API:", response.data); // Kiểm tra dữ liệu trả về
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi khi gọi API:", error);
+    return null;
+  }
+};
+
+
+export const usePerformanceStats = (startDate: string, endDate: string, period: string = "today") => {
+    return useQuery({
+        queryKey: ["performanceStats", startDate, endDate, period], // queryKey là một mảng
+        queryFn: () => fetchPerformanceStats(startDate, endDate, period), // queryFn là hàm gọi API
+        staleTime: 1000 * 60 * 5,  // Dữ liệu sẽ được cache trong 5 phút
+        enabled: !!startDate && !!endDate,  // Chỉ gọi API khi có `startDate` và `endDate`
+    });
+};
+
+
+const fetchRevenueStats = async (mode: string, year?: number) => {
+  try {
+    const response = await axiosClient.get(`/stats/revenue-analysis`, {
+      params: { mode, year }
+    });
+
+    console.log("Dữ liệu trả về từ API:", response.data);
+    return response.data;
+
+  } catch (error) {
+    console.error("Lỗi khi gọi API:", error);
+    return null;
+  }
+};
+
+
+
+export const useRevenueStats = (mode: "month", year?: number) => {
+    return useQuery({
+        queryKey: ["RevenueStats", mode, year],
+        queryFn: () => fetchRevenueStats(mode, year),
+        staleTime: 1000 * 60 * 5,  // cache 5 phút
+        enabled: !!mode,           // chỉ gọi API khi có mode
+    });
+};
+
+
+const fetchCategoryStats = async () => {
+  try {
+    const response = await axiosClient.get(`/stats/category-summary`);
+
+    console.log("Dữ liệu trả về từ API:", response.data);
+    return response.data;
+
+  } catch (error) {
+    console.error("Lỗi khi gọi API:", error);
+    return null;
+  }
+};
+
+
+
+export const useCategoryStats = () => {
+    return useQuery({
+        queryKey: ["RevenueStats"],
+        queryFn: () => fetchCategoryStats(),
+        staleTime: 1000 * 60 * 5,  // cache 5 phút
+    });
+};

@@ -20,10 +20,11 @@ import { axiosClient } from "../../../shared/lib/axiosClient";
 export default function StaffPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingStaff, setEditingStaff] = useState<any>(null);
-
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
     // ✅ Load danh sách
-    const { data, isLoading, refetch } = useStaffs(1, 10);
-   const Staffs = (data?.content as any[]) || (data as any[]) || [];
+    const { data, isLoading, refetch } = useStaffs(page, pageSize);
+    const Staffs = (data?.content as any[]) || (data as any[]) || [];
 
     // ✅ Xóa
     const handleDelete = async (id: number) => {
@@ -36,19 +37,7 @@ export default function StaffPage() {
             message.error("Không thể xóa nhân viên!");
         }
     };
-
-    const formatRank = (rank: string | null) => {
-        switch (rank) {
-            case "BRONZE": return <Tag color="orange">Đồng</Tag>;
-            case "SILVER": return <Tag color="gray">Bạc</Tag>;
-            case "GOLD": return <Tag color="gold">Vàng</Tag>;
-            case "DIAMOND": return <Tag color="blue">Kim cương</Tag>;
-            case "NEWBIE": return <Tag color="green">Nhân Viên Mới</Tag>;
-            default: return <Tag color="blue">Nhân Viên Mới</Tag>;
-        }
-    };
-
-
+    const totalElements = data?.totalElements || 0;
     // ✅ Cấu hình cột
     const columns = [
         { title: "ID", dataIndex: "id", key: "id", width: 60 },
@@ -114,7 +103,16 @@ export default function StaffPage() {
                 dataSource={Staffs}
                 rowKey="id"
                 loading={isLoading}
-                pagination={false}
+                pagination={{
+                    current: page,
+                    pageSize: pageSize,
+                    total: totalElements,
+                    showSizeChanger: true,
+                    onChange: (newPage, newSize) => {
+                        setPage(newPage);
+                        setPageSize(newSize);
+                    }
+                }}
             />
 
             <Modal

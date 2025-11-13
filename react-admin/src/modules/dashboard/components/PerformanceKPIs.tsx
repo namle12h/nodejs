@@ -1,8 +1,4 @@
-import React from 'react';
 
-// ===================================================
-// I. ĐỊNH NGHĨA INTERFACE VÀ DỮ LIỆU
-// ===================================================
 
 interface KPIItem {
     label: string;
@@ -21,9 +17,7 @@ const kpiData: KPIItem[] = [
     { label: "Doanh thu/Khách", currentValue: "850Kđ", targetValue: "800Kđ", unit: "hoàn thành", currentPercent: 95, targetPercent: 90 }, 
 ];
 
-// ===================================================
-// II. COMPONENT THANH TIẾN TRÌNH KPI
-// ===================================================
+
 
 const KPIProgressBar = ({ item }: { item: KPIItem }) => {
     // Logic xác định trạng thái Đạt/Chưa đạt
@@ -36,7 +30,6 @@ const KPIProgressBar = ({ item }: { item: KPIItem }) => {
     const barColor = isAchieved ? 'bg-green-500' : 'bg-yellow-500';
 
     return (
-        // Khối đơn lẻ, loại bỏ border vì chúng ta dùng gap trong grid
         <div className="flex flex-col space-y-2">
             
             {/* Hàng 1: Tiêu đề và Status */}

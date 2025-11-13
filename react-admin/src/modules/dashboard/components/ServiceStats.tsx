@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useServiceStats } from "../../../shared/services/statsApi"; // Import hook từ API
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import type { Dayjs } from "dayjs";
+
 
 // Khai báo kiểu cho Service
 interface Service {
@@ -10,11 +12,22 @@ interface Service {
     color?: string;  // Trường `color` có thể có hoặc không
 }
 
-export default function ServiceStats() {
-    const [startDate, setStartDate] = useState("2025-10-10");
-    const [endDate, setEndDate] = useState("2025-11-10");
+interface ServiceStatsProps {
+    startDate: Dayjs;
+    endDate: Dayjs;
+}
+
+export default function ServiceStats({ startDate, endDate }: ServiceStatsProps) {
+    // const [startDate, setStartDate] = useState<Dayjs>(dayjs()); // Khởi tạo bằng dayjs
+    // const [endDate, setEndDate] = useState<Dayjs>(dayjs());
     const [period, setPeriod] = useState("last_30_days");
-    const { data, isLoading } = useServiceStats(startDate, endDate, period);
+    const { data, isLoading } = useServiceStats(
+        startDate.format('YYYY-MM-DD'), // Định dạng ngày là YYYY-MM-DD
+        endDate.format('YYYY-MM-DD'),   // Định dạng ngày là YYYY-MM-DD
+        period
+    );
+
+
 
     // Trạng thái điều khiển xem thêm dịch vụ
     const [showAllServices, setShowAllServices] = useState(false);
@@ -41,6 +54,7 @@ export default function ServiceStats() {
 
     return (
         <div className="bg-white rounded-xl shadow p-6 w-full">
+
             <div className="flex justify-between">
                 <div>
                     <h3 className="text-lg font-semibold">Thống Kê Dịch Vụ</h3>
@@ -61,7 +75,7 @@ export default function ServiceStats() {
                             stroke="none"
                             strokeWidth={0}
                         >
-                            {dataWithColors.map((entry: Service, i:number) => (
+                            {dataWithColors.map((entry: Service, i: number) => (
                                 <Cell key={i} fill={entry.color} /> // Gán màu cho từng phần tử
                             ))}
                         </Pie>
@@ -77,7 +91,7 @@ export default function ServiceStats() {
 
             {/* List */}
             <div className="mt-3 text-left space-y-3">
-                {dataWithColors.map((item: Service, i:number) => (
+                {dataWithColors.map((item: Service, i: number) => (
                     <div key={i} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <span className="w-3 h-3 rounded-full" style={{ background: item.color }}></span>
@@ -105,6 +119,8 @@ export default function ServiceStats() {
                         </button>
                     </div>
                 )}
+
+
 
 
                 {/* Nút "Ẩn bớt" */}

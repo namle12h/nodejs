@@ -1,12 +1,103 @@
 import React, { useState } from 'react';
-import { ArrowUp, ArrowDown, Settings, Phone, Calendar, User, ShoppingBag, ChevronDown, Smile, Clock } from 'lucide-react';
+import { ArrowUp, ArrowDown } from 'lucide-react';
 import { UserOutlined, DollarOutlined, ScheduleOutlined, SmileOutlined } from '@ant-design/icons'; // Sử dụng Ant Design Icons cho khối chính
 import { CustomerOverviewCard, RecentCustomersCard, ServiceStatsCard } from './CustomerOverviewCard';
+import { useCategoryStats } from '../../../shared/services/statsApi';
 
 
 // ===================================================
 // I. CẤU TRÚC DỮ LIỆU ĐA LOẠI
 // ===================================================
+
+const convertApiToDataset = (apiData: any) => {
+    const mapPeriod = (p: any) => ({
+        period: "",
+        currentValue: p.current.toLocaleString("vi-VN"),
+        prevValue: p.previous.toLocaleString("vi-VN"),
+        changePercent: p.changePercent,
+        isUp: p.up,
+        changeAmount: Math.abs(p.current - p.previous)
+    });
+
+    return {
+        revenue: {
+            title: "Doanh thu",
+            icon: <DollarOutlined className="w-4 h-4" />,
+            iconColor: "bg-teal-500",
+            unit: "₫",
+            trendCards: [
+                { ...mapPeriod(apiData.revenue.today), period: "Hôm nay" },
+                { ...mapPeriod(apiData.revenue.week), period: "Tuần này" },
+                { ...mapPeriod(apiData.revenue.month), period: "Tháng này" },
+                { ...mapPeriod(apiData.revenue.quarter), period: "Quý này" }
+            ],
+            detailComparison: [
+                { ...mapPeriod(apiData.revenue.today), period: "Hôm nay" },
+                { ...mapPeriod(apiData.revenue.week), period: "Tuần này" },
+                { ...mapPeriod(apiData.revenue.month), period: "Tháng này" },
+                { ...mapPeriod(apiData.revenue.quarter), period: "Quý này" }
+            ]
+        },
+
+        customer: {
+            title: "Khách hàng",
+            icon: <UserOutlined className="w-4 h-4" />,
+            iconColor: "bg-green-500",
+            unit: "",
+            trendCards: [
+                { ...mapPeriod(apiData.customer.today), period: "Hôm nay" },
+                { ...mapPeriod(apiData.customer.week), period: "Tuần này" },
+                { ...mapPeriod(apiData.customer.month), period: "Tháng này" },
+                { ...mapPeriod(apiData.customer.quarter), period: "Quý này" }
+            ],
+            detailComparison: [
+                { ...mapPeriod(apiData.customer.today), period: "Hôm nay" },
+                { ...mapPeriod(apiData.customer.week), period: "Tuần này" },
+                { ...mapPeriod(apiData.customer.month), period: "Tháng này" },
+                { ...mapPeriod(apiData.customer.quarter), period: "Quý này" }
+            ]
+        },
+
+        appointment: {
+            title: "Lịch hẹn",
+            icon: <ScheduleOutlined className="w-4 h-4" />,
+            iconColor: "bg-blue-500",
+            unit: "",
+            trendCards: [
+                { ...mapPeriod(apiData.appointment.today), period: "Hôm nay" },
+                { ...mapPeriod(apiData.appointment.week), period: "Tuần này" },
+                { ...mapPeriod(apiData.appointment.month), period: "Tháng này" },
+                { ...mapPeriod(apiData.appointment.quarter), period: "Quý này" }
+            ],
+            detailComparison: [
+                { ...mapPeriod(apiData.appointment.today), period: "Hôm nay" },
+                { ...mapPeriod(apiData.appointment.week), period: "Tuần này" },
+                { ...mapPeriod(apiData.appointment.month), period: "Tháng này" },
+                { ...mapPeriod(apiData.appointment.quarter), period: "Quý này" }
+            ]
+        },
+
+        product: {
+            title: "Sản phẩm",
+            icon: <SmileOutlined className="w-4 h-4" />,
+            iconColor: "bg-purple-500",
+            unit: "₫",
+            trendCards: [
+                { ...mapPeriod(apiData.product.today), period: "Hôm nay" },
+                { ...mapPeriod(apiData.product.week), period: "Tuần này" },
+                { ...mapPeriod(apiData.product.month), period: "Tháng này" },
+                { ...mapPeriod(apiData.product.quarter), period: "Quý này" }
+            ],
+            detailComparison: [
+                { ...mapPeriod(apiData.product.today), period: "Hôm nay" },
+                { ...mapPeriod(apiData.product.week), period: "Tuần này" },
+                { ...mapPeriod(apiData.product.month), period: "Tháng này" },
+                { ...mapPeriod(apiData.product.quarter), period: "Quý này" }
+            ]
+        }
+    };
+};
+
 
 interface TrendCardItem {
     period: string;
@@ -82,7 +173,7 @@ const analysisDatasets: Record<string, AnalysisData> = {
         ],
         unit: ''
     },
-    satisfaction: {
+    product: {
         title: "Sản Phẩm ",
         icon: <SmileOutlined className="w-4 h-4" />,
         iconColor: "bg-purple-500",
@@ -109,6 +200,9 @@ const analysisDatasets: Record<string, AnalysisData> = {
 // ===================================================
 
 const TrendCard = ({ item }: { item: TrendCardItem }) => {
+
+
+
     const changeColor = item.isUp ? 'text-green-600' : 'text-red-500';
     const arrowIcon = item.isUp ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />;
 
@@ -131,15 +225,7 @@ const TrendCard = ({ item }: { item: TrendCardItem }) => {
 // KHỐI CHÍNH: PHÂN TÍCH DOANH THU & SO SÁNH
 // ===================================================
 
-const RevenueComparisonBlock = ({
-    dataCategory,
-    setDataCategory,
-    categoryOptions
-}: {
-    dataCategory: string,
-    setDataCategory: React.Dispatch<React.SetStateAction<'revenue' | 'customer' | 'appointment' | 'product'>>,
-    categoryOptions: { key: string, label: string }[]
-}) => {
+const RevenueComparisonBlock = ({ dataCategory, setDataCategory, categoryOptions, analysisDatasets }: any) => {
 
     const data = analysisDatasets[dataCategory];
 
@@ -164,15 +250,12 @@ const RevenueComparisonBlock = ({
                         value={dataCategory}
                         onChange={(e) => setDataCategory(e.target.value as 'revenue' | 'customer' | 'appointment' | 'product')}
                     >
-                        {categoryOptions.map(option => (
+                        {categoryOptions.map((option: any) => (
                             <option key={option.key} value={option.key}>{option.label}</option>
                         ))}
                     </select>
 
-                    <select className="border rounded-lg px-3 py-1.5 text-sm font-medium text-gray-700 bg-white shadow-sm">
-                        <option>So với kỳ trước</option>
-                        <option>So với năm trước</option>
-                    </select>
+                  
                 </div>
 
 
@@ -180,16 +263,17 @@ const RevenueComparisonBlock = ({
 
             {/* Hàng Thẻ Xu hướng (Hôm nay, Tuần, Tháng, Quý) */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 text-left">
-                {data.trendCards.map((item, index) => (
+                {data.trendCards.map((item: TrendCardItem, index: number) => (
                     <TrendCard key={index} item={item} />
                 ))}
+
             </div>
 
             {/* Khối Chi tiết So sánh */}
             <div className="mt-8 border-t text-left pt-4">
                 <h4 className="text-lg font-semibold  text-gray-800 mb-4">Chi Tiết So Sánh</h4>
 
-                {data.detailComparison.map((item, index) => {
+                {data.detailComparison.map((item: TrendCardItem, index: number) => {
                     const changeColor = item.isUp ? 'text-green-600 bg-green-50' : 'text-red-500 bg-red-50';
 
                     return (
@@ -237,6 +321,10 @@ export default function RevenueAnalysis() {
     // State để chọn loại dữ liệu, mặc định là 'customer' theo hình ảnh mới
     const [dataCategory, setDataCategory] = useState<'revenue' | 'customer' | 'appointment' | 'product'>('customer');
 
+    const { data, isLoading } = useCategoryStats();
+    if (isLoading) return <div>Loading...</div>;
+    const analysisDatasets = convertApiToDataset(data);
+
     // Tùy chọn Dropdown
     const categoryOptions = [
         { key: 'customer', label: 'Khách hàng' },
@@ -251,7 +339,7 @@ export default function RevenueAnalysis() {
                 dataCategory={dataCategory}
                 setDataCategory={setDataCategory}
                 categoryOptions={categoryOptions}
-
+                analysisDatasets={analysisDatasets}
             />
             <div className="grid mt-7 lg:grid-cols-3 gap-6 ">
                 <div className="lg:col-span-2 space-y-6 h-full">
@@ -260,7 +348,7 @@ export default function RevenueAnalysis() {
                 </div>
 
                 <div className="lg:col-span-1 h-full">
-                        <ServiceStatsCard />
+                    <ServiceStatsCard />
                 </div>
             </div>
 

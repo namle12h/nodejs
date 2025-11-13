@@ -20,11 +20,13 @@ import { axiosClient } from "../../../shared/lib/axiosClient";
 export default function CustomerPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<any>(null);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   // ✅ Load danh sách
-  const { data, isLoading, refetch } = useCustomers(1, 10);
+  const { data, isLoading, refetch } = useCustomers(page, pageSize);
   const customers = data?.content || [];
-
+  const totalElements = data?.totalElements || 0;
   // ✅ Xóa
   const handleDelete = async (id: number) => {
     try {
@@ -38,15 +40,15 @@ export default function CustomerPage() {
   };
 
   const formatRank = (rank: string | null) => {
-  switch (rank) {
-     case "BRONZE": return <Tag color="orange">Đồng</Tag>;
-    case "SILVER": return <Tag color="gray">Bạc</Tag>;
-    case "GOLD": return <Tag color="gold">Vàng</Tag>;
-    case "DIAMOND": return <Tag color="blue">Kim cương</Tag>;
-    case "NEWBIE": return <Tag color="green">Khách mới</Tag>;
-    default: return <Tag color="blue">Khách mới</Tag>;
-  }
-};
+    switch (rank) {
+      case "BRONZE": return <Tag color="orange">Đồng</Tag>;
+      case "SILVER": return <Tag color="gray">Bạc</Tag>;
+      case "GOLD": return <Tag color="gold">Vàng</Tag>;
+      case "DIAMOND": return <Tag color="blue">Kim cương</Tag>;
+      case "NEWBIE": return <Tag color="green">Khách mới</Tag>;
+      default: return <Tag color="blue">Khách mới</Tag>;
+    }
+  };
 
 
   // ✅ Cấu hình cột
@@ -59,7 +61,7 @@ export default function CustomerPage() {
     { title: "Ngày sinh", dataIndex: "dob", key: "dob" },
     // { title: "Địa chỉ", dataIndex: "address", key: "address" },
     { title: "LoyaltyPoints", dataIndex: "loyaltyPoints", key: "loyaltyPoints" },
-    { title: "Rank", dataIndex: "rankLevel", key: "rankLevel",render: (v: string | null) => formatRank(v), },
+    { title: "Rank", dataIndex: "rankLevel", key: "rankLevel", render: (v: string | null) => formatRank(v), },
     { title: "Tổng chi tiêu", dataIndex: "totalSpent", key: "totalSpent" },
 
     {
@@ -110,7 +112,16 @@ export default function CustomerPage() {
         dataSource={customers}
         rowKey="id"
         loading={isLoading}
-        pagination={false}
+        pagination={{
+          current: page,
+          pageSize: pageSize,
+          total: totalElements,
+          showSizeChanger: true,
+          onChange: (newPage, newSize) => {
+            setPage(newPage);
+            setPageSize(newSize);
+          }
+        }}
       />
 
       <Modal

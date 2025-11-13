@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useCustomerStats } from "../../../shared/services/statsApi";
+import type { Dayjs } from "dayjs";
 
 // Biểu đồ đơn giản cho thanh tiến trình
 interface ProgressItem {
@@ -15,6 +16,11 @@ interface CustomerTypeProps {
     count: number;
     percent: string;
     color: string;
+}
+
+interface CustomerStatsProps {
+    startDate: Dayjs;
+    endDate: Dayjs;
 }
 
 const ProgressBar = ({ label, value, percent, color }: ProgressItem) => (
@@ -55,12 +61,16 @@ const CustomerType = ({
     </div>
 );
 
-export default function CustomerAnalysis() {
-    const [startDate, setStartDate] = useState("2025-10-10");
-    const [endDate, setEndDate] = useState("2025-11-10");
+export default function CustomerAnalysis({ startDate, endDate }:CustomerStatsProps) {
+    // const [startDate, setStartDate] = useState("2025-10-10");
+    // const [endDate, setEndDate] = useState("2025-11-10");
     const [period, setPeriod] = useState("last_30_days");
-    const { data, isLoading } = useCustomerStats(startDate, endDate, period);
-
+    // const { data, isLoading } = useCustomerStats(startDate, endDate, period);
+   const { data, isLoading } = useCustomerStats(
+        startDate.format('YYYY-MM-DD'), // Định dạng ngày là YYYY-MM-DD
+        endDate.format('YYYY-MM-DD'),   // Định dạng ngày là YYYY-MM-DD
+        period
+    );
     // Nếu dữ liệu đang tải, hiển thị thông báo "Loading..."
     if (isLoading) return <div>Loading...</div>;
 

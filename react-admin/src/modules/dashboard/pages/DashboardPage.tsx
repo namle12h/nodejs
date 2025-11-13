@@ -11,26 +11,22 @@ import RevenueAndServiceTrends from '../components/RevenueAndServiceTrends';
 import PerformanceKPIs from '../components/PerformanceKPIs';
 import RevenueAnalysis from '../components/RevenueAnalysis';
 import { useOverviewStats } from '../../../shared/services/statsApi';
-
-// ===================================================
-// I. CÁC COMPONENT PHỤ CẦN THIẾT
-// ===================================================
+import dayjs, { Dayjs } from 'dayjs';
 
 const tabs = [
   { id: 'overview', label: 'Tổng Quan' },
   { id: 'performance', label: 'Hiệu Suất' },
   { id: 'analysis', label: 'Phân Tích' },
-  { id: 'realtime', label: 'Thời Gian Thực' },
 ];
 
-const PlaceholderContent = ({ tab }: { tab: string }) => (
-  <div className="p-8 bg-white rounded-xl shadow-md text-center text-gray-500 border border-gray-100 h-96">
-    Nội dung chi tiết cho tab "{tab}" sẽ được tải tại đây.
-  </div>
-);
+
 
 // Tab Navigation Component
-function TabNavigation({ children, activeTab, setActiveTab }: { children: React.ReactNode, activeTab: string, setActiveTab: (tab: string) => void }) {
+function TabNavigation({ children, activeTab, setActiveTab, startDate,
+  endDate }: {
+    children: React.ReactNode, activeTab: string, setActiveTab: (tab: string) => void, startDate: Dayjs,  // Thêm startDate vào kiểu props
+    endDate: Dayjs
+  }) {
   return (
     <div className="w-full">
       {/* Thanh Tab Navigation */}
@@ -61,9 +57,14 @@ function TabNavigation({ children, activeTab, setActiveTab }: { children: React.
         {activeTab === 'overview' && <div className="space-y-6">{children}</div>}
         {activeTab === 'performance' && (
           <div className="space-y-6">
-            <PerformanceStatsCard />
+            <PerformanceStatsCard
+              // startDate={dayjs("2025-10-30")} // Chuyển chuỗi thành Dayjs
+              // endDate={dayjs("2025-11-12")} // Chuyển chuỗi thành Dayjs
+              startDate={startDate}
+              endDate={endDate}
+            />
             <PerformanceKPIs />
-            <RevenueAndServiceTrends />
+            <RevenueAndServiceTrends mode="month" year={2025} />
           </div>
         )}
         {activeTab === 'analysis' && (
@@ -71,7 +72,6 @@ function TabNavigation({ children, activeTab, setActiveTab }: { children: React.
             <RevenueAnalysis />
           </div>
         )}
-        {activeTab === 'realtime' && <PlaceholderContent tab="Thời Gian Thực" />}
       </div>
     </div>
   );
@@ -85,18 +85,38 @@ function TabNavigation({ children, activeTab, setActiveTab }: { children: React.
 export default function DashboardPage() {
   const [isFiltersVisible, setIsFiltersVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('overview'); // 👈 State Tab mới
-  const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
-  const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
-  const [period, setPeriod] = useState("last_30_days");
-  const { data, isLoading } = useOverviewStats(startDate, endDate, period);
 
+  // const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
+  // const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
+  const [startDate, setStartDate] = useState<Dayjs>(dayjs()); // Khởi tạo bằng dayjs
+  const [endDate, setEndDate] = useState<Dayjs>(dayjs());
+  const [period, setPeriod] = useState("last_30_days");
+  // const { data, isLoading } = useOverviewStats(startDate, endDate, period);
+  //  const { data, isLoading } = useOverviewStats(startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD'), period);
+  const { data, isLoading } = useOverviewStats(
+    startDate.format('YYYY-MM-DD'), // Định dạng ngày là YYYY-MM-DD
+    endDate.format('YYYY-MM-DD'),   // Định dạng ngày là YYYY-MM-DD
+    period
+  );
+
+
+  console.log("startDate:", startDate);
+  console.log("endDate:", startDate);
   if (isLoading) return <div>Loading...</div>;
 
   const toggleFilters = () => {
     setIsFiltersVisible(!isFiltersVisible);
   };
 
-  console.log(data); 
+  const handleDateChange = (newStartDate: Dayjs | null, newEndDate: Dayjs | null) => {
+    // Nếu newStartDate là null, gán ngày hiện tại, nếu không thì giữ nguyên newStartDate
+    setStartDate(newStartDate ?? dayjs());
+
+    // Nếu newEndDate là null, gán ngày hiện tại, nếu không thì giữ nguyên newEndDate
+    setEndDate(newEndDate ?? dayjs());
+  };
+
+  console.log(data);
   // Dữ liệu stats ĐÃ SỬA ĐỔI để khớp với thiết kế (màu sắc Icon và màu percent)
   const stats = [
     {
@@ -186,12 +206,19 @@ export default function DashboardPage() {
       {/* BỘ LỌC NÂNG CAO - HIỂN THỊ TRÊN CÁC TAB */}
       {isFiltersVisible && (
         <div className="mb-6">
-          <AdvancedFilters />
+          {/* <AdvancedFilters />
+           */}
+          <AdvancedFilters
+            startDate={startDate}
+            endDate={endDate}
+            onDateChange={handleDateChange}
+          />
         </div>
       )}
 
       {/* 👈 BỌC NỘI DUNG CHÍNH BẰNG TAB NAVIGATION */}
-      <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab}>
+      <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} startDate={startDate} // Truyền startDate
+        endDate={endDate} >
 
         {/* Nội dung Tab TỔNG QUAN (Chỉ hiển thị khi activeTab='overview') */}
 
@@ -236,14 +263,14 @@ export default function DashboardPage() {
 
           {/* Hàng 1: Biểu đồ lớn (Chart) và Biểu đồ tròn (Donut/Pie) */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2"><StatsChart /></div>
-            <div className="lg:col-span-1"><ServiceStats /></div>
+            <div className="lg:col-span-2"><StatsChart mode='month' year={2025} /></div>
+            <div className="lg:col-span-1">  <ServiceStats startDate={startDate} endDate={endDate} /></div>
           </div>
 
           {/* Hàng 2: Phân tích Khách hàng và Lịch hẹn (Chia đều 2 cột) */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <CustomerAnalysis />
-            <AppointmentStats />
+            <CustomerAnalysis startDate={startDate} endDate={endDate} />
+            <AppointmentStats startDate={startDate} endDate={endDate} />
           </div>
         </div>
 
